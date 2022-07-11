@@ -858,3 +858,40 @@ Other Failures:
   <NO_OTHER_FAILURES>
 ***************************************
 
+[master 4dd2fe7] Jul11-14:59:38-MDT2022
+ 31 files changed, 2648 insertions(+), 44 deletions(-)
+ create mode 100644 GNN-RDM/genacc_cag.sh
+ create mode 100644 GNN-RDM/src/run_full_dgl.sh
+ delete mode 100644 arctic25_adj_part_rk0
+ delete mode 100644 arctic25_adj_part_rk1
+ create mode 100755 batch.sh
+ create mode 100644 dgl/__pycache__/config.cpython-37.pyc
+ create mode 100644 dgl/__pycache__/modules.cpython-37.pyc
+ create mode 100644 dgl/__pycache__/sampler.cpython-37.pyc
+ create mode 100644 dgl/__pycache__/utils.cpython-37.pyc
+ create mode 100644 dgl/log/arctic25/test/loggings
+ create mode 100644 dgl/log/meta/test/loggings
+ create mode 100644 dgl/log/ogbn-arxiv/test/loggings
+ create mode 100644 dgl/log/ogbn-products/test/loggings
+ create mode 100644 dgl/log/oral/test/loggings
+ create mode 100644 dgl/test
+ create mode 100644 dgl/train_full_load.py
+ rename notch347_full_acc.csv => full_acc.csv (100%)
+ delete mode 100644 meta_adj_part_rk0
+ delete mode 100644 meta_adj_part_rk1
+ delete mode 100644 ogbn-arxiv_adj_part_rk0
+ delete mode 100644 ogbn-arxiv_adj_part_rk1
+ delete mode 100644 oral_adj_part_rk0
+ delete mode 100644 oral_adj_part_rk1
+ create mode 100644 slurm-4924207.out
+ create mode 100755 ssn.bat
+remote: error: Trace: ab33bf4c2e15a48bf9a092864fcbd4fd7dc4ddcd9c56c64b496f995b751b7892        
+remote: error: See http://git.io/iEPt8g for more information.        
+remote: error: File oral_adj_part_rk0 is 414.56 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: File arctic25_adj_part_rk0 is 880.77 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: File meta_adj_part_rk0 is 994.57 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
+To github.com:JoseYan/GNNs.git
+ ! [remote rejected] master -> master (pre-receive hook declined)
+error: failed to push some refs to 'github.com:JoseYan/GNNs.git'
+run.sh: line 28: pushd: ../GNN_logs: No such file or directory
