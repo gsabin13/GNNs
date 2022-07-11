@@ -716,7 +716,7 @@ def split_coo(adj_matrix, node_count, n_per_proc, dim):
     return am_partitions, vtx_indices
 
 # Normalize all elements according to KW's normalization rule
-def scale_elements(adj_matrix, adj_part, node_count, row_vtx, col_vtx):
+def scale_elements(adj_matrix, adj_part, node_count, row_vtx, col_vtx, rank=None, save=False):
     if not normalization:
         return adj_part
 
@@ -774,6 +774,9 @@ def scale_elements(adj_matrix, adj_part, node_count, row_vtx, col_vtx):
     adj_part = torch.sparse_coo_tensor(adj_part_ind, adj_part_val, 
                                                 size=(adj_part.size(0), adj_part.size(1)),
                                                 requires_grad=False, device=torch.device("cpu"))
+
+    if save:
+        torch.save(adj_part, f"{graphname}_adj_part_rk{rank}")
 
     return adj_part
 
@@ -872,7 +875,7 @@ def oned_partition(rank, size, inputs, adj_matrix, data, features, classes, devi
                                                 torch.ones(am_partitions[row_id].size(1)), 
                                                 size=(proc_node_count, node_count), 
                                                 requires_grad=False)
-        am_partitions[row_id] = scale_elements(adj_matrix, am_partitions[row_id], node_count,  vtx_indices[row_id], 0)
+        am_partitions[row_id] = scale_elements(adj_matrix, am_partitions[row_id], node_count,  vtx_indices[row_id], 0, rank=rank,save=True)
         
         # First split inputs into multiple row panels
         inputs_row = torch.split(inputs, math.ceil(float(inputs.size(0)) / replication), dim=0)
