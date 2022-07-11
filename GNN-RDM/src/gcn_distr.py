@@ -647,7 +647,8 @@ def run(rank, size, inputs, adj_matrix, data, features, classes, device):
                     best_val_acc = val_acc
                     test_acc = tmp_test_acc
                 #log = 'Epoch: {:03d}, Train: {:.4f}, Val: {:.4f}, Test: {:.4f}'
-                logline = f'{graphname},CAGNET-1D,{epoch},{cumulative_time:.4f},{tmp_test_acc:.4f}\n'
+                ws = os.environ['WORLD_SIZE']
+                logline = f'{graphname},CAGNET-1D,{ws},{epoch},{cumulative_time:.4f},{tmp_test_acc:.4f}\n'
                 if rank == 0 and len(args.acc_csv)>2:
                     print(logline)
                     if not osp.exists(args.acc_csv):

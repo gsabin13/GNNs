@@ -10,9 +10,9 @@ echo $env_output
 echo $prog_output
 
 git show > $git_output
-git diff > $git_output
+git diff >> $git_output
 env > $env_output
-pip list > $env_output
+pip list >> $env_output
 
 cmd=""
 for i in $*

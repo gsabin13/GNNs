@@ -659,39 +659,40 @@ def run(rank, size, inputs, adj_matrix, data, features, classes, device):
                                     rank, size, group, row_groups, col_groups)
             print("Epoch: {:03d}".format(epoch), flush=True)
             cumulative_time += time.time()-ep_s
-            #if len(args.acc_csv)>2:
-            #    # All-gather outputs to test accuracy
-            #    output_parts = []
-            #    n_per_proc = math.ceil(float(inputs.size(0)) / size)
-            #    # print(f"rows: {am_pbyp[-1].size(0)} cols: {classes}", flush=True)
-            #    for i in range(size):
-            #        output_parts.append(torch.cuda.FloatTensor(n_per_proc, classes, device=device).fill_(0))
+            if len(args.acc_csv)>2:
+                # All-gather outputs to test accuracy
+                output_parts = []
+                n_per_proc = math.ceil(float(inputs.size(0)) / size)
+                # print(f"rows: {am_pbyp[-1].size(0)} cols: {classes}", flush=True)
+                for i in range(size):
+                    output_parts.append(torch.cuda.FloatTensor(n_per_proc, classes, device=device).fill_(0))
 
-            #    if outputs.size(0) != n_per_proc:
-            #        pad_row = n_per_proc - outputs.size(0)
-            #        outputs = torch.cat((outputs, torch.cuda.FloatTensor(pad_row, classes, device=device)), dim=0)
+                if outputs.size(0) != n_per_proc:
+                    pad_row = n_per_proc - outputs.size(0)
+                    outputs = torch.cat((outputs, torch.cuda.FloatTensor(pad_row, classes, device=device)), dim=0)
 
-            #    dist.all_gather(output_parts, outputs)
-            #    output_parts[rank] = outputs
+                dist.all_gather(output_parts, outputs)
+                output_parts[rank] = outputs
 
-            #    padding = inputs.size(0) - n_per_proc * (size - 1)
-            #    output_parts[size - 1] = output_parts[size - 1][:padding,:]
+                padding = inputs.size(0) - n_per_proc * (size - 1)
+                output_parts[size - 1] = output_parts[size - 1][:padding,:]
 
-            #    outputs = torch.cat(output_parts, dim=0)
+                outputs = torch.cat(output_parts, dim=0)
 
-            #    train_acc, val_acc, tmp_test_acc = test(outputs, data, am_pbyp[0].size(1), rank)
-            #    if val_acc > best_val_acc:
-            #        best_val_acc = val_acc
-            #        test_acc = tmp_test_acc
-            #    #log = 'Epoch: {:03d}, Train: {:.4f}, Val: {:.4f}, Test: {:.4f}'
-            #    logline = f'{graphname},CAGNET-1.5D,{epoch},{cumulative_time:.4f},{tmp_test_acc:.4f}\n'
-            #    if rank == 0 and len(args.acc_csv)>2:
-            #        print(logline)
-            #        if not osp.exists(args.acc_csv):
-            #            with open(args.acc_csv,'a') as ff:
-            #                ff.write('Dataset,Method,Epoch,Time (seconds),Accuracy\n')
-            #        with open(args.acc_csv,'a') as ff:
-            #            ff.write(logline)
+                train_acc, val_acc, tmp_test_acc = test(outputs, data, am_pbyp[0].size(1), rank)
+                if val_acc > best_val_acc:
+                    best_val_acc = val_acc
+                    test_acc = tmp_test_acc
+                #log = 'Epoch: {:03d}, Train: {:.4f}, Val: {:.4f}, Test: {:.4f}'
+                ws = os.environ['WORLD_SIZE']
+                logline = f'{graphname},CAGNET-1.5D,{ws},{epoch},{cumulative_time:.4f},{tmp_test_acc:.4f}\n'
+                if rank == 0 and len(args.acc_csv)>2:
+                    print(logline)
+                    if not osp.exists(args.acc_csv):
+                        with open(args.acc_csv,'a') as ff:
+                            ff.write('Dataset,Method,Epoch,Time (seconds),Accuracy\n')
+                    with open(args.acc_csv,'a') as ff:
+                        ff.write(logline)
 
         # dist.barrier(group)
         torch.cuda.synchronize(device=device)

@@ -776,7 +776,8 @@ def scale_elements(adj_matrix, adj_part, node_count, row_vtx, col_vtx, rank=None
                                                 requires_grad=False, device=torch.device("cpu"))
 
     if save:
-        torch.save(adj_part, f"{graphname}_adj_part_rk{rank}")
+        pre = '/scratch/general/nfs1/u1320844/dataset/GNNs'
+        torch.save(adj_part, f"{pre}/{graphname}_adj_part_rk{rank}.pt")
 
     return adj_part
 
@@ -1141,9 +1142,9 @@ def run(rank, size, inputs, adj_matrix, data, features, classes, device):
                 log = 'Epoch: {:03d}, Train: {:.4f}, Val: {:.4f}, Test: {:.4f}'.format(epoch, train_acc, best_val_acc, test_acc)
                 if rank == 0:
                     print(log)
-                    with open('notch347_full_acc.csv', 'a') as f:
+                    with open(args.acc_csv, 'a') as f:
                         ws = os.environ['WORLD_SIZE']
-                        log = f'{graphname},{ws},{epoch:03d},{elapsed_time:.4f},{test_acc:.4f}\n'
+                        log = f'{graphname},RDM,{ws},{epoch:03d},{elapsed_time:.4f},{test_acc:.4f}\n'
                         f.write(log) 
 
 
@@ -1486,6 +1487,7 @@ if __name__ == '__main__':
     parser.add_argument("--download", type=bool)
     parser.add_argument("--mmorder", type=str)
     parser.add_argument("--replication", type=int)
+    parser.add_argument("--acc_csv", type=str)
 
 
     args = parser.parse_args()
