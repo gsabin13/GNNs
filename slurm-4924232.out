@@ -37960,3 +37960,24 @@ oral,dgl,1,1999,145.8494,0.8504
 
 training using time 1212.9219725131989
 Test F1-mic 0.8504, Test F1-mac 0.5378
+[master 71005ef] Jul11-15:23:42-MDT2022
+ 11 files changed, 54452 insertions(+), 899 deletions(-)
+ create mode 100644 full.csv
+ create mode 100644 log/arctic25/test/loggings
+ create mode 100644 log/meta/test/loggings
+ create mode 100644 log/ogbn-arxiv/test/loggings
+ create mode 100644 log/ogbn-products/test/loggings
+ create mode 100644 log/oral/test/loggings
+ delete mode 100644 slurm-4924207.out
+ create mode 100644 slurm-4924224.out
+ create mode 100644 slurm-4924232.out
+remote: error: Trace: 80f95b8d8b2e5151c21b610f94b8233fd0c2eb6f1a5b7adefd3670ae90907d55        
+remote: error: See http://git.io/iEPt8g for more information.        
+remote: error: File arctic25_adj_part_rk0 is 880.77 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: File meta_adj_part_rk0 is 994.57 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: File oral_adj_part_rk0 is 414.56 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
+To github.com:JoseYan/GNNs.git
+ ! [remote rejected] master -> master (pre-receive hook declined)
+error: failed to push some refs to 'github.com:JoseYan/GNNs.git'
+run.sh: line 28: pushd: ../GNN_logs: No such file or directory
