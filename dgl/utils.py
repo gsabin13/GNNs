@@ -74,9 +74,9 @@ def evaluate(model, g, labels, mask, multilabel=False):
         labels = labels[mask]
         #acc = eval(labels.cpu().numpy(),
         #                         logits.cpu().numpy(), multilabel)
-        y_pred = np.argmax(logits, axis=1)
+        y_pred = np.argmax(logits.cpu().numpy(), axis=1)
         y_true = labels
-        acc = f1_score(y_true.cpu().numpy(), y_pred.cpu().numpy(), average='micro')
+        acc = f1_score(y_true.cpu().numpy(), y_pred, average='micro')
         return acc 
 
 
