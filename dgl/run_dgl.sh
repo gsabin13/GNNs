@@ -8,6 +8,6 @@ for graph in ogbn-products ogbn-arxiv reddit meta arctic25 oral
 do
     for ngpu in 1
     do
-        python -m torch.distributed.run --nnodes=$ws --nproc_per_node=$ngpu --node_rank=$rk --master_addr=$root --master_port=12355  train_full_load.py  --dataset $graph --csv $csv
+        python -m torch.distributed.run --nnodes=$ws --nproc_per_node=$ngpu --node_rank=$rk --master_addr=$root --master_port=12355  dgl/train_full_load.py  --dataset $graph --csv $csv
     done
 done

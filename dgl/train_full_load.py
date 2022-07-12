@@ -73,7 +73,7 @@ def main(args):
     # 2. put the model on gpu in training phase, and put the model on cpu in validation/testing phase
     # We need to judge cpu_flag and cuda (below) simultaneously when shift model between cpu and gpu
     if args.dataset in ['amazon', 'reddit', 'ogbn-products']:
-        cpu_flag = True
+        cpu_flag = False 
     else:
         cpu_flag = False
 
@@ -282,6 +282,7 @@ def main(args):
                 model = model.to('cpu')
             #val_f1_mic, val_f1_mac = evaluate(
             #    model, g, labels, val_mask, multilabel)
+            #g = g.to(device)
             val_f1_mic, val_f1_mac = evaluate(
                 model, g, g.ndata['label'], test_mask, False)
             print(
