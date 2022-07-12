@@ -37981,3 +37981,1390 @@ To github.com:JoseYan/GNNs.git
  ! [remote rejected] master -> master (pre-receive hook declined)
 error: failed to push some refs to 'github.com:JoseYan/GNNs.git'
 run.sh: line 28: pushd: ../GNN_logs: No such file or directory
+[master a815b39] Jul11-15:23:42-MDT2022
+ 1 file changed, 21 insertions(+)
+remote: error: Trace: f0151c86c323d2c2cdc6420975f31ec2039866b11be6ce45706e3a174f7a5b08        
+remote: error: See http://git.io/iEPt8g for more information.        
+remote: error: File meta_adj_part_rk0 is 994.57 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: File oral_adj_part_rk0 is 414.56 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: File arctic25_adj_part_rk0 is 880.77 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
+To github.com:JoseYan/GNNs.git
+ ! [remote rejected] master -> master (pre-receive hook declined)
+error: failed to push some refs to 'github.com:JoseYan/GNNs.git'
+run.sh: line 32: popd: directory stack empty
++ sh run.sh sh GNN-RDM/genacc_cag.sh
+Date:  Jul11-18:05:20-MDT2022
+/uufs/chpc.utah.edu/common/home/u1320844/GNNs_log/Jul11-18:05:20-MDT2022_env_info.txt
+/uufs/chpc.utah.edu/common/home/u1320844/GNNs_log/Jul11-18:05:20-MDT2022_running_log.txt
+WARNING:root:The OGB package is out of date. Your version is 1.3.2, while the latest version is 1.3.3.
+Namespace(acc_csv='full.csv', accperrank=1, accuracy='True', activations='True', csv='', download=None, epochs=2000, graphname='ogbn-products', local_rank=None, midlayer=128, normalization='True', runcount=1, timing='True')
+Arguments: epochs: 2000 graph: ogbn-products timing: True mid: 128 norm: True act: True acc: True runs: 1
+notch347
+Processes: 1
+device: cuda:0
+rank: 0 adj_matrix_loc.size: torch.Size([2449029, 2449029])
+rank: 0 inputs.size: torch.Size([2449029, 100])
+[W ProcessGroupNCCL.cpp:1569] Rank 0 using best-guess GPU 0 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device.
+/uufs/chpc.utah.edu/common/home/u1320844/anaconda3/envs/ogb/lib/python3.7/site-packages/torch/distributed/distributed_c10d.py:153: UserWarning: torch.distributed.reduce_op is deprecated, please use torch.distributed.ReduceOp instead
+  warnings.warn("torch.distributed.reduce_op is deprecated, please use "
+Starting training... rank 0 run 0
+Epoch: 000
+ogbn-products,CAGNET-1D,1,0,0.4826,0.0212
+
+Epoch: 001
+ogbn-products,CAGNET-1D,1,1,0.9650,0.0346
+
+Epoch: 002
+ogbn-products,CAGNET-1D,1,2,1.4473,0.0441
+
+Epoch: 003
+ogbn-products,CAGNET-1D,1,3,1.9297,0.0492
+
+Epoch: 004
+ogbn-products,CAGNET-1D,1,4,2.4119,0.0540
+
+Epoch: 005
+ogbn-products,CAGNET-1D,1,5,2.8942,0.0600
+
+Epoch: 006
+ogbn-products,CAGNET-1D,1,6,3.3765,0.0687
+
+Epoch: 007
+ogbn-products,CAGNET-1D,1,7,3.8588,0.0826
+
+Epoch: 008
+ogbn-products,CAGNET-1D,1,8,4.3412,0.1021
+
+Epoch: 009
+ogbn-products,CAGNET-1D,1,9,4.8233,0.1225
+
+Epoch: 010
+ogbn-products,CAGNET-1D,1,10,5.3056,0.1388
+
+Epoch: 011
+ogbn-products,CAGNET-1D,1,11,5.7879,0.1506
+
+Epoch: 012
+ogbn-products,CAGNET-1D,1,12,6.2703,0.1605
+
+Epoch: 013
+ogbn-products,CAGNET-1D,1,13,6.7529,0.1694
+
+Epoch: 014
+ogbn-products,CAGNET-1D,1,14,7.2354,0.1774
+
+Epoch: 015
+ogbn-products,CAGNET-1D,1,15,7.7175,0.1844
+
+Epoch: 016
+ogbn-products,CAGNET-1D,1,16,8.1996,0.1903
+
+Epoch: 017
+ogbn-products,CAGNET-1D,1,17,8.6818,0.1953
+
+Epoch: 018
+ogbn-products,CAGNET-1D,1,18,9.1642,0.1993
+
+Epoch: 019
+ogbn-products,CAGNET-1D,1,19,9.6468,0.2026
+
+Epoch: 020
+ogbn-products,CAGNET-1D,1,20,10.1291,0.2049
+
+Epoch: 021
+ogbn-products,CAGNET-1D,1,21,10.6117,0.2063
+
+Epoch: 022
+ogbn-products,CAGNET-1D,1,22,11.0938,0.2070
+
+Epoch: 023
+ogbn-products,CAGNET-1D,1,23,11.5760,0.2071
+
+Epoch: 024
+ogbn-products,CAGNET-1D,1,24,12.0592,0.2069
+
+Epoch: 025
+ogbn-products,CAGNET-1D,1,25,12.5424,0.2062
+
+Epoch: 026
+ogbn-products,CAGNET-1D,1,26,13.0256,0.2052
+
+Epoch: 027
+ogbn-products,CAGNET-1D,1,27,13.5094,0.2037
+
+Epoch: 028
+ogbn-products,CAGNET-1D,1,28,13.9927,0.2021
+
+Epoch: 029
+ogbn-products,CAGNET-1D,1,29,14.4761,0.2004
+
+Epoch: 030
+ogbn-products,CAGNET-1D,1,30,14.9596,0.1985
+
+Epoch: 031
+ogbn-products,CAGNET-1D,1,31,15.4432,0.1966
+
+Epoch: 032
+ogbn-products,CAGNET-1D,1,32,15.9267,0.1947
+
+Epoch: 033
+ogbn-products,CAGNET-1D,1,33,16.4102,0.1928
+
+Epoch: 034
+ogbn-products,CAGNET-1D,1,34,16.8939,0.1910
+
+Epoch: 035
+ogbn-products,CAGNET-1D,1,35,17.3773,0.1891
+
+Epoch: 036
+ogbn-products,CAGNET-1D,1,36,17.8609,0.1873
+
+Epoch: 037
+ogbn-products,CAGNET-1D,1,37,18.3448,0.1856
+
+Epoch: 038
+ogbn-products,CAGNET-1D,1,38,18.8282,0.1840
+
+Epoch: 039
+ogbn-products,CAGNET-1D,1,39,19.3112,0.1826
+
+Epoch: 040
+ogbn-products,CAGNET-1D,1,40,19.7946,0.1815
+
+Epoch: 041
+ogbn-products,CAGNET-1D,1,41,20.2781,0.1804
+
+Epoch: 042
+ogbn-products,CAGNET-1D,1,42,20.7613,0.1795
+
+Epoch: 043
+ogbn-products,CAGNET-1D,1,43,21.2447,0.1788
+
+Epoch: 044
+ogbn-products,CAGNET-1D,1,44,21.7279,0.1783
+
+Epoch: 045
+ogbn-products,CAGNET-1D,1,45,22.2113,0.1779
+
+Epoch: 046
+ogbn-products,CAGNET-1D,1,46,22.6945,0.1777
+
+Epoch: 047
+ogbn-products,CAGNET-1D,1,47,23.1779,0.1776
+
+Epoch: 048
+ogbn-products,CAGNET-1D,1,48,23.6611,0.1776
+
+Epoch: 049
+ogbn-products,CAGNET-1D,1,49,24.1442,0.1776
+
+Epoch: 050
+ogbn-products,CAGNET-1D,1,50,24.6273,0.1777
+
+Epoch: 051
+ogbn-products,CAGNET-1D,1,51,25.1110,0.1777
+
+Epoch: 052
+ogbn-products,CAGNET-1D,1,52,25.5944,0.1777
+
+Epoch: 053
+ogbn-products,CAGNET-1D,1,53,26.0782,0.1776
+
+Epoch: 054
+ogbn-products,CAGNET-1D,1,54,26.5620,0.1775
+
+Epoch: 055
+ogbn-products,CAGNET-1D,1,55,27.0457,0.1773
+
+Epoch: 056
+ogbn-products,CAGNET-1D,1,56,27.5289,0.1771
+
+Epoch: 057
+ogbn-products,CAGNET-1D,1,57,28.0124,0.1768
+
+Epoch: 058
+ogbn-products,CAGNET-1D,1,58,28.4957,0.1765
+
+Epoch: 059
+ogbn-products,CAGNET-1D,1,59,28.9787,0.1762
+
+Epoch: 060
+ogbn-products,CAGNET-1D,1,60,29.4625,0.1759
+
+Epoch: 061
+ogbn-products,CAGNET-1D,1,61,29.9456,0.1755
+
+Epoch: 062
+ogbn-products,CAGNET-1D,1,62,30.4289,0.1753
+
+Epoch: 063
+ogbn-products,CAGNET-1D,1,63,30.9124,0.1750
+
+Epoch: 064
+ogbn-products,CAGNET-1D,1,64,31.3957,0.1747
+
+Epoch: 065
+ogbn-products,CAGNET-1D,1,65,31.8789,0.1748
+
+Epoch: 066
+ogbn-products,CAGNET-1D,1,66,32.3619,0.1749
+
+Epoch: 067
+ogbn-products,CAGNET-1D,1,67,32.8450,0.1752
+
+Epoch: 068
+ogbn-products,CAGNET-1D,1,68,33.3282,0.1757
+
+Epoch: 069
+ogbn-products,CAGNET-1D,1,69,33.8112,0.1764
+
+Epoch: 070
+ogbn-products,CAGNET-1D,1,70,34.2946,0.1774
+
+Epoch: 071
+ogbn-products,CAGNET-1D,1,71,34.7779,0.1785
+
+Epoch: 072
+ogbn-products,CAGNET-1D,1,72,35.2611,0.1797
+
+Epoch: 073
+ogbn-products,CAGNET-1D,1,73,35.7444,0.1809
+
+Epoch: 074
+ogbn-products,CAGNET-1D,1,74,36.2278,0.1820
+
+Epoch: 075
+ogbn-products,CAGNET-1D,1,75,36.7112,0.1832
+
+Epoch: 076
+ogbn-products,CAGNET-1D,1,76,37.1949,0.1842
+
+Epoch: 077
+ogbn-products,CAGNET-1D,1,77,37.6783,0.1853
+
+Epoch: 078
+ogbn-products,CAGNET-1D,1,78,38.1619,0.1865
+
+Epoch: 079
+ogbn-products,CAGNET-1D,1,79,38.6457,0.1879
+
+Epoch: 080
+ogbn-products,CAGNET-1D,1,80,39.1291,0.1896
+
+Epoch: 081
+ogbn-products,CAGNET-1D,1,81,39.6130,0.1918
+
+Epoch: 082
+ogbn-products,CAGNET-1D,1,82,40.0961,0.1943
+
+Epoch: 083
+ogbn-products,CAGNET-1D,1,83,40.5794,0.1969
+
+Epoch: 084
+ogbn-products,CAGNET-1D,1,84,41.0628,0.1996
+
+Epoch: 085
+ogbn-products,CAGNET-1D,1,85,41.5464,0.2022
+
+Epoch: 086
+ogbn-products,CAGNET-1D,1,86,42.0300,0.2042
+
+Epoch: 087
+ogbn-products,CAGNET-1D,1,87,42.5135,0.2059
+
+Epoch: 088
+ogbn-products,CAGNET-1D,1,88,42.9968,0.2070
+
+Epoch: 089
+ogbn-products,CAGNET-1D,1,89,43.4801,0.2078
+
+Epoch: 090
+ogbn-products,CAGNET-1D,1,90,43.9635,0.2083
+
+Epoch: 091
+ogbn-products,CAGNET-1D,1,91,44.4468,0.2087
+
+Epoch: 092
+ogbn-products,CAGNET-1D,1,92,44.9304,0.2091
+
+Epoch: 093
+ogbn-products,CAGNET-1D,1,93,45.4137,0.2096
+
+Epoch: 094
+ogbn-products,CAGNET-1D,1,94,45.8969,0.2100
+
+Epoch: 095
+ogbn-products,CAGNET-1D,1,95,46.3801,0.2105
+
+Epoch: 096
+ogbn-products,CAGNET-1D,1,96,46.8634,0.2108
+
+Epoch: 097
+ogbn-products,CAGNET-1D,1,97,47.3467,0.2109
+
+Epoch: 098
+ogbn-products,CAGNET-1D,1,98,47.8299,0.2108
+
+Epoch: 099
+ogbn-products,CAGNET-1D,1,99,48.3133,0.2107
+
+Epoch: 100
+ogbn-products,CAGNET-1D,1,100,48.7966,0.2108
+
+Epoch: 101
+ogbn-products,CAGNET-1D,1,101,49.2799,0.2106
+
+Epoch: 102
+ogbn-products,CAGNET-1D,1,102,49.7637,0.2108
+
+Epoch: 103
+ogbn-products,CAGNET-1D,1,103,50.2474,0.2110
+
+Epoch: 104
+ogbn-products,CAGNET-1D,1,104,50.7310,0.2112
+
+Epoch: 105
+ogbn-products,CAGNET-1D,1,105,51.2145,0.2114
+
+Epoch: 106
+ogbn-products,CAGNET-1D,1,106,51.6982,0.2114
+
+Epoch: 107
+ogbn-products,CAGNET-1D,1,107,52.1817,0.2113
+
+Epoch: 108
+ogbn-products,CAGNET-1D,1,108,52.6656,0.2112
+
+Epoch: 109
+ogbn-products,CAGNET-1D,1,109,53.1488,0.2111
+
+Epoch: 110
+ogbn-products,CAGNET-1D,1,110,53.6325,0.2110
+
+Epoch: 111
+ogbn-products,CAGNET-1D,1,111,54.1157,0.2109
+
+Epoch: 112
+ogbn-products,CAGNET-1D,1,112,54.5993,0.2108
+
+Epoch: 113
+ogbn-products,CAGNET-1D,1,113,55.0828,0.2105
+
+Epoch: 114
+ogbn-products,CAGNET-1D,1,114,55.5660,0.2102
+
+Epoch: 115
+ogbn-products,CAGNET-1D,1,115,56.0490,0.2098
+
+Epoch: 116
+ogbn-products,CAGNET-1D,1,116,56.5325,0.2096
+
+Epoch: 117
+ogbn-products,CAGNET-1D,1,117,57.0157,0.2092
+
+Epoch: 118
+ogbn-products,CAGNET-1D,1,118,57.4989,0.2088
+
+Epoch: 119
+ogbn-products,CAGNET-1D,1,119,57.9822,0.2084
+
+Epoch: 120
+ogbn-products,CAGNET-1D,1,120,58.4656,0.2080
+
+Epoch: 121
+ogbn-products,CAGNET-1D,1,121,58.9490,0.2075
+
+Epoch: 122
+ogbn-products,CAGNET-1D,1,122,59.4324,0.2072
+
+Epoch: 123
+ogbn-products,CAGNET-1D,1,123,59.9162,0.2069
+
+Epoch: 124
+ogbn-products,CAGNET-1D,1,124,60.3996,0.2066
+
+Epoch: 125
+ogbn-products,CAGNET-1D,1,125,60.8829,0.2063
+
+Epoch: 126
+ogbn-products,CAGNET-1D,1,126,61.3663,0.2060
+
+Epoch: 127
+ogbn-products,CAGNET-1D,1,127,61.8498,0.2057
+
+Epoch: 128
+ogbn-products,CAGNET-1D,1,128,62.3332,0.2053
+
+Epoch: 129
+ogbn-products,CAGNET-1D,1,129,62.8166,0.2050
+
+Epoch: 130
+ogbn-products,CAGNET-1D,1,130,63.3001,0.2048
+
+Epoch: 131
+ogbn-products,CAGNET-1D,1,131,63.7837,0.2044
+
+Epoch: 132
+ogbn-products,CAGNET-1D,1,132,64.2671,0.2040
+
+Epoch: 133
+ogbn-products,CAGNET-1D,1,133,64.7509,0.2037
+
+Epoch: 134
+ogbn-products,CAGNET-1D,1,134,65.2343,0.2033
+
+Epoch: 135
+ogbn-products,CAGNET-1D,1,135,65.7177,0.2028
+
+Epoch: 136
+ogbn-products,CAGNET-1D,1,136,66.2014,0.2023
+
+Epoch: 137
+ogbn-products,CAGNET-1D,1,137,66.6850,0.2020
+
+Epoch: 138
+ogbn-products,CAGNET-1D,1,138,67.1685,0.2017
+
+Epoch: 139
+ogbn-products,CAGNET-1D,1,139,67.6521,0.2013
+
+Epoch: 140
+ogbn-products,CAGNET-1D,1,140,68.1356,0.2009
+
+Epoch: 141
+ogbn-products,CAGNET-1D,1,141,68.6187,0.2005
+
+Epoch: 142
+ogbn-products,CAGNET-1D,1,142,69.1023,0.2002
+
+Epoch: 143
+ogbn-products,CAGNET-1D,1,143,69.5856,0.1999
+
+Epoch: 144
+ogbn-products,CAGNET-1D,1,144,70.0687,0.1996
+
+Epoch: 145
+ogbn-products,CAGNET-1D,1,145,70.5520,0.1993
+
+Epoch: 146
+ogbn-products,CAGNET-1D,1,146,71.0357,0.1990
+
+Epoch: 147
+ogbn-products,CAGNET-1D,1,147,71.5189,0.1987
+
+Epoch: 148
+ogbn-products,CAGNET-1D,1,148,72.0023,0.1985
+
+Epoch: 149
+ogbn-products,CAGNET-1D,1,149,72.4858,0.1983
+
+Epoch: 150
+ogbn-products,CAGNET-1D,1,150,72.9694,0.1980
+
+Epoch: 151
+ogbn-products,CAGNET-1D,1,151,73.4530,0.1975
+
+Epoch: 152
+ogbn-products,CAGNET-1D,1,152,73.9362,0.1973
+
+Epoch: 153
+ogbn-products,CAGNET-1D,1,153,74.4196,0.1973
+
+Epoch: 154
+ogbn-products,CAGNET-1D,1,154,74.9028,0.1970
+
+Epoch: 155
+ogbn-products,CAGNET-1D,1,155,75.3861,0.1967
+
+Epoch: 156
+ogbn-products,CAGNET-1D,1,156,75.8694,0.1965
+
+Epoch: 157
+ogbn-products,CAGNET-1D,1,157,76.3527,0.1962
+
+Epoch: 158
+ogbn-products,CAGNET-1D,1,158,76.8365,0.1959
+
+Epoch: 159
+ogbn-products,CAGNET-1D,1,159,77.3195,0.1959
+
+Epoch: 160
+ogbn-products,CAGNET-1D,1,160,77.8029,0.1959
+
+Epoch: 161
+ogbn-products,CAGNET-1D,1,161,78.2868,0.1956
+
+Epoch: 162
+ogbn-products,CAGNET-1D,1,162,78.7704,0.1951
+
+Epoch: 163
+ogbn-products,CAGNET-1D,1,163,79.2537,0.1948
+
+Epoch: 164
+ogbn-products,CAGNET-1D,1,164,79.7371,0.1948
+
+Epoch: 165
+ogbn-products,CAGNET-1D,1,165,80.2204,0.1947
+
+Epoch: 166
+ogbn-products,CAGNET-1D,1,166,80.7040,0.1944
+
+Epoch: 167
+ogbn-products,CAGNET-1D,1,167,81.1874,0.1940
+
+Epoch: 168
+ogbn-products,CAGNET-1D,1,168,81.6707,0.1938
+
+Epoch: 169
+ogbn-products,CAGNET-1D,1,169,82.1541,0.1935
+
+Epoch: 170
+ogbn-products,CAGNET-1D,1,170,82.6377,0.1933
+
+Epoch: 171
+ogbn-products,CAGNET-1D,1,171,83.1212,0.1930
+
+Epoch: 172
+ogbn-products,CAGNET-1D,1,172,83.6047,0.1926
+
+Epoch: 173
+ogbn-products,CAGNET-1D,1,173,84.0883,0.1926
+
+Epoch: 174
+ogbn-products,CAGNET-1D,1,174,84.5717,0.1921
+
+Epoch: 175
+ogbn-products,CAGNET-1D,1,175,85.0551,0.1918
+
+Epoch: 176
+ogbn-products,CAGNET-1D,1,176,85.5389,0.1915
+
+Epoch: 177
+ogbn-products,CAGNET-1D,1,177,86.0222,0.1915
+
+Epoch: 178
+ogbn-products,CAGNET-1D,1,178,86.5053,0.1914
+
+Epoch: 179
+ogbn-products,CAGNET-1D,1,179,86.9888,0.1908
+
+Epoch: 180
+ogbn-products,CAGNET-1D,1,180,87.4720,0.1905
+
+Epoch: 181
+ogbn-products,CAGNET-1D,1,181,87.9553,0.1901
+
+Epoch: 182
+ogbn-products,CAGNET-1D,1,182,88.4384,0.1900
+
+Epoch: 183
+ogbn-products,CAGNET-1D,1,183,88.9216,0.1897
+
+Epoch: 184
+ogbn-products,CAGNET-1D,1,184,89.4049,0.1895
+
+Epoch: 185
+ogbn-products,CAGNET-1D,1,185,89.8881,0.1891
+
+Epoch: 186
+ogbn-products,CAGNET-1D,1,186,90.3714,0.1886
+
+Epoch: 187
+ogbn-products,CAGNET-1D,1,187,90.8546,0.1883
+
+Epoch: 188
+ogbn-products,CAGNET-1D,1,188,91.3378,0.1882
+
+Epoch: 189
+ogbn-products,CAGNET-1D,1,189,91.8213,0.1879
+
+Epoch: 190
+ogbn-products,CAGNET-1D,1,190,92.3046,0.1875
+
+Epoch: 191
+ogbn-products,CAGNET-1D,1,191,92.7879,0.1873
+
+Epoch: 192
+ogbn-products,CAGNET-1D,1,192,93.2710,0.1869
+
+Epoch: 193
+ogbn-products,CAGNET-1D,1,193,93.7542,0.1870
+
+Epoch: 194
+ogbn-products,CAGNET-1D,1,194,94.2374,0.1866
+
+Epoch: 195
+ogbn-products,CAGNET-1D,1,195,94.7209,0.1861
+
+Epoch: 196
+ogbn-products,CAGNET-1D,1,196,95.2044,0.1858
+
+Epoch: 197
+ogbn-products,CAGNET-1D,1,197,95.6880,0.1859
+
+Epoch: 198
+ogbn-products,CAGNET-1D,1,198,96.1713,0.1857
+
+Epoch: 199
+ogbn-products,CAGNET-1D,1,199,96.6547,0.1854
+
+Epoch: 200
+ogbn-products,CAGNET-1D,1,200,97.1384,0.1849
+
+Epoch: 201
+ogbn-products,CAGNET-1D,1,201,97.6218,0.1851
+
+Epoch: 202
+ogbn-products,CAGNET-1D,1,202,98.1055,0.1846
+
+Epoch: 203
+ogbn-products,CAGNET-1D,1,203,98.5888,0.1845
+
+Epoch: 204
+ogbn-products,CAGNET-1D,1,204,99.0724,0.1843
+
+Epoch: 205
+ogbn-products,CAGNET-1D,1,205,99.5560,0.1840
+
+Epoch: 206
+ogbn-products,CAGNET-1D,1,206,100.0392,0.1840
+
+Epoch: 207
+ogbn-products,CAGNET-1D,1,207,100.5229,0.1834
+
+Epoch: 208
+ogbn-products,CAGNET-1D,1,208,101.0066,0.1833
+
+Epoch: 209
+ogbn-products,CAGNET-1D,1,209,101.4902,0.1834
+
+Epoch: 210
+ogbn-products,CAGNET-1D,1,210,101.9737,0.1830
+
+Epoch: 211
+ogbn-products,CAGNET-1D,1,211,102.4573,0.1829
+
+Epoch: 212
+ogbn-products,CAGNET-1D,1,212,102.9409,0.1827
+
+Epoch: 213
+ogbn-products,CAGNET-1D,1,213,103.4245,0.1825
+
+Epoch: 214
+ogbn-products,CAGNET-1D,1,214,103.9080,0.1821
+
+Epoch: 215
+ogbn-products,CAGNET-1D,1,215,104.3913,0.1820
+
+Epoch: 216
+ogbn-products,CAGNET-1D,1,216,104.8748,0.1821
+
+Epoch: 217
+ogbn-products,CAGNET-1D,1,217,105.3583,0.1819
+
+Epoch: 218
+ogbn-products,CAGNET-1D,1,218,105.8418,0.1814
+
+Epoch: 219
+ogbn-products,CAGNET-1D,1,219,106.3251,0.1813
+
+Epoch: 220
+ogbn-products,CAGNET-1D,1,220,106.8087,0.1816
+
+Epoch: 221
+ogbn-products,CAGNET-1D,1,221,107.2919,0.1808
+
+Epoch: 222
+ogbn-products,CAGNET-1D,1,222,107.7758,0.1809
+
+Epoch: 223
+ogbn-products,CAGNET-1D,1,223,108.2595,0.1807
+
+Epoch: 224
+ogbn-products,CAGNET-1D,1,224,108.7429,0.1803
+
+Epoch: 225
+ogbn-products,CAGNET-1D,1,225,109.2263,0.1800
+
+Epoch: 226
+ogbn-products,CAGNET-1D,1,226,109.7096,0.1805
+
+Epoch: 227
+ogbn-products,CAGNET-1D,1,227,110.1930,0.1799
+
+Epoch: 228
+ogbn-products,CAGNET-1D,1,228,110.6762,0.1793
+
+Epoch: 229
+ogbn-products,CAGNET-1D,1,229,111.1593,0.1798
+
+Epoch: 230
+ogbn-products,CAGNET-1D,1,230,111.6425,0.1797
+
+Epoch: 231
+ogbn-products,CAGNET-1D,1,231,112.1256,0.1790
+
+Epoch: 232
+ogbn-products,CAGNET-1D,1,232,112.6092,0.1790
+
+Epoch: 233
+ogbn-products,CAGNET-1D,1,233,113.0925,0.1796
+
+Epoch: 234
+ogbn-products,CAGNET-1D,1,234,113.5757,0.1785
+
+Epoch: 235
+ogbn-products,CAGNET-1D,1,235,114.0591,0.1786
+
+Epoch: 236
+ogbn-products,CAGNET-1D,1,236,114.5426,0.1792
+
+Epoch: 237
+ogbn-products,CAGNET-1D,1,237,115.0262,0.1786
+
+Epoch: 238
+ogbn-products,CAGNET-1D,1,238,115.5094,0.1778
+
+Epoch: 239
+ogbn-products,CAGNET-1D,1,239,115.9931,0.1788
+
+Epoch: 240
+ogbn-products,CAGNET-1D,1,240,116.4762,0.1783
+
+Epoch: 241
+ogbn-products,CAGNET-1D,1,241,116.9597,0.1777
+
+Epoch: 242
+ogbn-products,CAGNET-1D,1,242,117.4431,0.1781
+
+Epoch: 243
+ogbn-products,CAGNET-1D,1,243,117.9263,0.1777
+
+Epoch: 244
+ogbn-products,CAGNET-1D,1,244,118.4095,0.1777
+
+Epoch: 245
+ogbn-products,CAGNET-1D,1,245,118.8928,0.1775
+
+Epoch: 246
+ogbn-products,CAGNET-1D,1,246,119.3760,0.1776
+
+Epoch: 247
+ogbn-products,CAGNET-1D,1,247,119.8599,0.1769
+
+Epoch: 248
+ogbn-products,CAGNET-1D,1,248,120.3436,0.1777
+
+Epoch: 249
+ogbn-products,CAGNET-1D,1,249,120.8270,0.1770
+
+Epoch: 250
+ogbn-products,CAGNET-1D,1,250,121.3103,0.1768
+
+Epoch: 251
+ogbn-products,CAGNET-1D,1,251,121.7939,0.1769
+
+Epoch: 252
+ogbn-products,CAGNET-1D,1,252,122.2770,0.1772
+
+Epoch: 253
+ogbn-products,CAGNET-1D,1,253,122.7602,0.1763
+
+Epoch: 254
+ogbn-products,CAGNET-1D,1,254,123.2434,0.1766
+
+Epoch: 255
+ogbn-products,CAGNET-1D,1,255,123.7267,0.1769
+
+Epoch: 256
+ogbn-products,CAGNET-1D,1,256,124.2101,0.1761
+
+Epoch: 257
+ogbn-products,CAGNET-1D,1,257,124.6940,0.1764
+
+Epoch: 258
+ogbn-products,CAGNET-1D,1,258,125.1772,0.1766
+
+Epoch: 259
+ogbn-products,CAGNET-1D,1,259,125.6608,0.1759
+
+Epoch: 260
+ogbn-products,CAGNET-1D,1,260,126.1443,0.1761
+
+Epoch: 261
+ogbn-products,CAGNET-1D,1,261,126.6278,0.1759
+
+Epoch: 262
+ogbn-products,CAGNET-1D,1,262,127.1115,0.1761
+
+Epoch: 263
+ogbn-products,CAGNET-1D,1,263,127.5947,0.1757
+
+Epoch: 264
+ogbn-products,CAGNET-1D,1,264,128.0779,0.1760
+
+Epoch: 265
+ogbn-products,CAGNET-1D,1,265,128.5609,0.1758
+
+Epoch: 266
+ogbn-products,CAGNET-1D,1,266,129.0442,0.1756
+
+Epoch: 267
+ogbn-products,CAGNET-1D,1,267,129.5273,0.1756
+
+Epoch: 268
+ogbn-products,CAGNET-1D,1,268,130.0106,0.1756
+
+Epoch: 269
+ogbn-products,CAGNET-1D,1,269,130.4938,0.1754
+
+Epoch: 270
+ogbn-products,CAGNET-1D,1,270,130.9772,0.1754
+
+Epoch: 271
+ogbn-products,CAGNET-1D,1,271,131.4606,0.1757
+
+Epoch: 272
+ogbn-products,CAGNET-1D,1,272,131.9448,0.1753
+
+Epoch: 273
+ogbn-products,CAGNET-1D,1,273,132.4284,0.1753
+
+Epoch: 274
+ogbn-products,CAGNET-1D,1,274,132.9120,0.1758
+
+Epoch: 275
+ogbn-products,CAGNET-1D,1,275,133.3952,0.1750
+
+Epoch: 276
+ogbn-products,CAGNET-1D,1,276,133.8788,0.1753
+
+Epoch: 277
+ogbn-products,CAGNET-1D,1,277,134.3619,0.1753
+
+Epoch: 278
+ogbn-products,CAGNET-1D,1,278,134.8454,0.1754
+
+Epoch: 279
+ogbn-products,CAGNET-1D,1,279,135.3287,0.1750
+
+Epoch: 280
+ogbn-products,CAGNET-1D,1,280,135.8122,0.1752
+
+Epoch: 281
+ogbn-products,CAGNET-1D,1,281,136.2958,0.1748
+
+Epoch: 282
+ogbn-products,CAGNET-1D,1,282,136.7794,0.1756
+
+Epoch: 283
+ogbn-products,CAGNET-1D,1,283,137.2627,0.1747
+
+Epoch: 284
+ogbn-products,CAGNET-1D,1,284,137.7459,0.1748
+
+Epoch: 285
+ogbn-products,CAGNET-1D,1,285,138.2291,0.1755
+
+Epoch: 286
+ogbn-products,CAGNET-1D,1,286,138.7126,0.1747
+
+Epoch: 287
+ogbn-products,CAGNET-1D,1,287,139.1957,0.1747
+
+Epoch: 288
+ogbn-products,CAGNET-1D,1,288,139.6789,0.1749
+
+Epoch: 289
+ogbn-products,CAGNET-1D,1,289,140.1622,0.1753
+
+Epoch: 290
+ogbn-products,CAGNET-1D,1,290,140.6454,0.1745
+
+Epoch: 291
+ogbn-products,CAGNET-1D,1,291,141.1286,0.1750
+
+Epoch: 292
+ogbn-products,CAGNET-1D,1,292,141.6119,0.1755
+
+Epoch: 293
+ogbn-products,CAGNET-1D,1,293,142.0952,0.1743
+
+Epoch: 294
+ogbn-products,CAGNET-1D,1,294,142.5783,0.1753
+
+Epoch: 295
+ogbn-products,CAGNET-1D,1,295,143.0616,0.1748
+
+Epoch: 296
+ogbn-products,CAGNET-1D,1,296,143.5445,0.1748
+
+Epoch: 297
+ogbn-products,CAGNET-1D,1,297,144.0282,0.1750
+
+Epoch: 298
+ogbn-products,CAGNET-1D,1,298,144.5115,0.1748
+
+Epoch: 299
+ogbn-products,CAGNET-1D,1,299,144.9946,0.1747
+
+Epoch: 300
+ogbn-products,CAGNET-1D,1,300,145.4780,0.1751
+
+Epoch: 301
+ogbn-products,CAGNET-1D,1,301,145.9613,0.1743
+
+Epoch: 302
+ogbn-products,CAGNET-1D,1,302,146.4444,0.1751
+
+Epoch: 303
+ogbn-products,CAGNET-1D,1,303,146.9280,0.1746
+
+Epoch: 304
+ogbn-products,CAGNET-1D,1,304,147.4112,0.1743
+
+Epoch: 305
+ogbn-products,CAGNET-1D,1,305,147.8945,0.1750
+
+Epoch: 306
+ogbn-products,CAGNET-1D,1,306,148.3775,0.1742
+
+Epoch: 307
+ogbn-products,CAGNET-1D,1,307,148.8609,0.1742
+
+Epoch: 308
+ogbn-products,CAGNET-1D,1,308,149.3440,0.1751
+
+Epoch: 309
+ogbn-products,CAGNET-1D,1,309,149.8272,0.1735
+
+Epoch: 310
+ogbn-products,CAGNET-1D,1,310,150.3103,0.1748
+
+Epoch: 311
+ogbn-products,CAGNET-1D,1,311,150.7936,0.1742
+
+Epoch: 312
+ogbn-products,CAGNET-1D,1,312,151.2771,0.1735
+
+Epoch: 313
+ogbn-products,CAGNET-1D,1,313,151.7604,0.1750
+
+Epoch: 314
+ogbn-products,CAGNET-1D,1,314,152.2438,0.1732
+
+Epoch: 315
+ogbn-products,CAGNET-1D,1,315,152.7271,0.1744
+
+Epoch: 316
+ogbn-products,CAGNET-1D,1,316,153.2102,0.1738
+
+Epoch: 317
+ogbn-products,CAGNET-1D,1,317,153.6934,0.1735
+
+Epoch: 318
+ogbn-products,CAGNET-1D,1,318,154.1770,0.1744
+
+Epoch: 319
+ogbn-products,CAGNET-1D,1,319,154.6604,0.1721
+
+Epoch: 320
+ogbn-products,CAGNET-1D,1,320,155.1438,0.1752
+
+Epoch: 321
+ogbn-products,CAGNET-1D,1,321,155.6274,0.1715
+
+Epoch: 322
+ogbn-products,CAGNET-1D,1,322,156.1110,0.1747
+
+Epoch: 323
+ogbn-products,CAGNET-1D,1,323,156.5943,0.1725
+
+Epoch: 324
+ogbn-products,CAGNET-1D,1,324,157.0781,0.1731
+
+Epoch: 325
+ogbn-products,CAGNET-1D,1,325,157.5617,0.1738
+
+Epoch: 326
+ogbn-products,CAGNET-1D,1,326,158.0450,0.1715
+
+Epoch: 327
+ogbn-products,CAGNET-1D,1,327,158.5281,0.1746
+
+Epoch: 328
+ogbn-products,CAGNET-1D,1,328,159.0117,0.1709
+
+Epoch: 329
+ogbn-products,CAGNET-1D,1,329,159.4950,0.1742
+
+Epoch: 330
+ogbn-products,CAGNET-1D,1,330,159.9784,0.1715
+
+Epoch: 331
+ogbn-products,CAGNET-1D,1,331,160.4619,0.1729
+
+Epoch: 332
+ogbn-products,CAGNET-1D,1,332,160.9450,0.1725
+
+Epoch: 333
+ogbn-products,CAGNET-1D,1,333,161.4285,0.1720
+
+Epoch: 334
+ogbn-products,CAGNET-1D,1,334,161.9119,0.1724
+
+Epoch: 335
+ogbn-products,CAGNET-1D,1,335,162.3951,0.1716
+
+Epoch: 336
+ogbn-products,CAGNET-1D,1,336,162.8786,0.1720
+
+Epoch: 337
+ogbn-products,CAGNET-1D,1,337,163.3620,0.1715
+
+Epoch: 338
+ogbn-products,CAGNET-1D,1,338,163.8449,0.1718
+
+Epoch: 339
+ogbn-products,CAGNET-1D,1,339,164.3283,0.1704
+
+Epoch: 340
+ogbn-products,CAGNET-1D,1,340,164.8118,0.1730
+
+Epoch: 341
+ogbn-products,CAGNET-1D,1,341,165.2952,0.1685
+
+Epoch: 342
+ogbn-products,CAGNET-1D,1,342,165.7785,0.1734
+
+Epoch: 343
+ogbn-products,CAGNET-1D,1,343,166.2618,0.1679
+
+Epoch: 344
+ogbn-products,CAGNET-1D,1,344,166.7449,0.1729
+
+Epoch: 345
+ogbn-products,CAGNET-1D,1,345,167.2282,0.1682
+
+Epoch: 346
+ogbn-products,CAGNET-1D,1,346,167.7115,0.1717
+
+Epoch: 347
+ogbn-products,CAGNET-1D,1,347,168.1948,0.1687
+
+Epoch: 348
+ogbn-products,CAGNET-1D,1,348,168.6779,0.1706
+
+Epoch: 349
+ogbn-products,CAGNET-1D,1,349,169.1610,0.1692
+
+Epoch: 350
+ogbn-products,CAGNET-1D,1,350,169.6442,0.1697
+
+Epoch: 351
+ogbn-products,CAGNET-1D,1,351,170.1278,0.1701
+
+Epoch: 352
+ogbn-products,CAGNET-1D,1,352,170.6111,0.1681
+
+Epoch: 353
+ogbn-products,CAGNET-1D,1,353,171.0943,0.1712
+
+Epoch: 354
+ogbn-products,CAGNET-1D,1,354,171.5777,0.1666
+
+Epoch: 355
+ogbn-products,CAGNET-1D,1,355,172.0610,0.1720
+
+Epoch: 356
+ogbn-products,CAGNET-1D,1,356,172.5442,0.1660
+
+Epoch: 357
+ogbn-products,CAGNET-1D,1,357,173.0277,0.1718
+
+Epoch: 358
+ogbn-products,CAGNET-1D,1,358,173.5108,0.1660
+
+Epoch: 359
+ogbn-products,CAGNET-1D,1,359,173.9943,0.1717
+
+Epoch: 360
+ogbn-products,CAGNET-1D,1,360,174.4778,0.1659
+
+Epoch: 361
+ogbn-products,CAGNET-1D,1,361,174.9612,0.1708
+
+Epoch: 362
+ogbn-products,CAGNET-1D,1,362,175.4448,0.1677
+
+Epoch: 363
+ogbn-products,CAGNET-1D,1,363,175.9280,0.1681
+
+Epoch: 364
+ogbn-products,CAGNET-1D,1,364,176.4113,0.1703
+
+Epoch: 365
+ogbn-products,CAGNET-1D,1,365,176.8947,0.1658
+
+Epoch: 366
+ogbn-products,CAGNET-1D,1,366,177.3783,0.1711
+
+Epoch: 367
+ogbn-products,CAGNET-1D,1,367,177.8619,0.1655
+
+Epoch: 368
+ogbn-products,CAGNET-1D,1,368,178.3453,0.1711
+
+Epoch: 369
+ogbn-products,CAGNET-1D,1,369,178.8285,0.1651
+
+Epoch: 370
+ogbn-products,CAGNET-1D,1,370,179.3120,0.1714
+
+Epoch: 371
+ogbn-products,CAGNET-1D,1,371,179.7950,0.1645
+
+Epoch: 372
+ogbn-products,CAGNET-1D,1,372,180.2783,0.1717
+
+Epoch: 373
+ogbn-products,CAGNET-1D,1,373,180.7615,0.1647
+
+Epoch: 374
+ogbn-products,CAGNET-1D,1,374,181.2449,0.1705
+
+Epoch: 375
+ogbn-products,CAGNET-1D,1,375,181.7284,0.1669
+
+Epoch: 376
+ogbn-products,CAGNET-1D,1,376,182.2119,0.1678
+
+Epoch: 377
+ogbn-products,CAGNET-1D,1,377,182.6954,0.1692
+
+Epoch: 378
+ogbn-products,CAGNET-1D,1,378,183.1787,0.1667
+
+Epoch: 379
+ogbn-products,CAGNET-1D,1,379,183.6621,0.1697
+
+Epoch: 380
+ogbn-products,CAGNET-1D,1,380,184.1460,0.1667
+
+Epoch: 381
+ogbn-products,CAGNET-1D,1,381,184.6294,0.1694
+
+Epoch: 382
+ogbn-products,CAGNET-1D,1,382,185.1134,0.1674
+
+Epoch: 383
+ogbn-products,CAGNET-1D,1,383,185.5966,0.1686
+
+Epoch: 384
+ogbn-products,CAGNET-1D,1,384,186.0799,0.1683
+
+Epoch: 385
+ogbn-products,CAGNET-1D,1,385,186.5635,0.1679
+
+Epoch: 386
+ogbn-products,CAGNET-1D,1,386,187.0470,0.1689
+
+Epoch: 387
+ogbn-products,CAGNET-1D,1,387,187.5304,0.1672
+
+Epoch: 388
+ogbn-products,CAGNET-1D,1,388,188.0137,0.1695
+
+Epoch: 389
+ogbn-products,CAGNET-1D,1,389,188.4973,0.1668
+
+Epoch: 390
+ogbn-products,CAGNET-1D,1,390,188.9806,0.1699
+
+Epoch: 391
+ogbn-products,CAGNET-1D,1,391,189.4642,0.1664
+
+Epoch: 392
+ogbn-products,CAGNET-1D,1,392,189.9473,0.1701
+
+Epoch: 393
+ogbn-products,CAGNET-1D,1,393,190.4308,0.1662
+
+Epoch: 394
+ogbn-products,CAGNET-1D,1,394,190.9139,0.1704
+
+Epoch: 395
+ogbn-products,CAGNET-1D,1,395,191.3971,0.1653
+
+Epoch: 396
+ogbn-products,CAGNET-1D,1,396,191.8807,0.1718
+
+Epoch: 397
+ogbn-products,CAGNET-1D,1,397,192.3639,0.1624
+
+Epoch: 398
+ogbn-products,CAGNET-1D,1,398,192.8471,0.1756
+
+Epoch: 399
+ogbn-products,CAGNET-1D,1,399,193.3304,0.1575
+
+Epoch: 400
+ogbn-products,CAGNET-1D,1,400,193.8138,0.1777
+
+Epoch: 401
+ogbn-products,CAGNET-1D,1,401,194.2974,0.1591
+
+Epoch: 402
+ogbn-products,CAGNET-1D,1,402,194.7809,0.1712
+
+Epoch: 403
+ogbn-products,CAGNET-1D,1,403,195.2645,0.1691
+
+Epoch: 404
+ogbn-products,CAGNET-1D,1,404,195.7479,0.1614
+
+Epoch: 405
+ogbn-products,CAGNET-1D,1,405,196.2316,0.1739
+
+Epoch: 406
+ogbn-products,CAGNET-1D,1,406,196.7153,0.1626
+
+Epoch: 407
+ogbn-products,CAGNET-1D,1,407,197.1989,0.1669
+
+Epoch: 408
+ogbn-products,CAGNET-1D,1,408,197.6825,0.1708
+
+Epoch: 409
+ogbn-products,CAGNET-1D,1,409,198.1664,0.1614
+
+Epoch: 410
+ogbn-products,CAGNET-1D,1,410,198.6500,0.1703
+
+Epoch: 411
+ogbn-products,CAGNET-1D,1,411,199.1335,0.1667
+
+Epoch: 412
+ogbn-products,CAGNET-1D,1,412,199.6170,0.1634
+
+Epoch: 413
+ogbn-products,CAGNET-1D,1,413,200.1005,0.1706
+
+total_times_r0: [205.10271096229553]
+rank: 0 median_run: 0
+rank: 0 total_time: 205.10271096229553
+rank: 0 comm_time: 0.24725341796875
+rank: 0 comp_time: 187.5002691745758
+rank: 0 scomp_time: 183.05847716331482
+rank: 0 dcomp_time: 4.441792011260986
+rank: 0 bcast_comm_time: 0.19814133644104004
+rank: 0 barrier_time: 7.251117706298828
+rank: 0 barrier_subset_time: 0.0
+rank: 0 op1_comm_time: 0.0
+rank: 0 op2_comm_time: 0.04911208152770996
+rank: 0 tensor([[ -3.0824,  -2.6084,  -3.0750,  ..., -68.6893, -68.0183, -80.6732],
+        [ -2.4398,  -3.3531,  -2.8380,  ..., -39.3304, -39.5216, -47.4761],
+        [ -2.2323,  -2.7592,  -3.0549,  ..., -44.8181, -44.5679, -52.8089],
+        ...,
+        [ -2.7234,  -2.7193,  -2.7971,  ..., -13.6941, -14.1694, -15.7617],
+        [ -2.0522,  -2.7745,  -2.8400,  ..., -63.7491, -61.5700, -81.2409],
+        [ -2.6580,  -3.1742,  -2.7785,  ..., -27.3259, -28.4003, -34.0682]],
+       device='cuda:0', grad_fn=<CatBackward>)
+Epoch: 900, Train: 0.3021, Val: 0.2925, Test: 0.2098
+None
+WARNING:root:The OGB package is out of date. Your version is 1.3.2, while the latest version is 1.3.3.
+Namespace(acc_csv='full.csv', accperrank=1, accuracy='True', activations='True', csv='', download=None, epochs=2000, graphname='ogbn-products', local_rank=None, midlayer=128, normalization='True', replication=2, runcount=1, timing='True')
+Arguments: epochs: 2000 graph: ogbn-products timing: True mid: 128 norm: True act: True acc: True runs: 1 rep: 2
+notch347
+Processes: 1
+tensor([[      0,  152857,       0,  ..., 2449028,   53324, 2449028],
+        [ 152857,       0,   32104,  ...,  162836, 2449028,   53324]],
+       device='cuda:0')
+tensor([[ 152857,       0,   32104,  ...,  162836, 2449028,   53324],
+        [      0,  152857,       0,  ..., 2449028,   53324, 2449028]])
+Traceback (most recent call last):
+  File "GNN-RDM/src/gcn_distr_15d.py", line 1053, in <module>
+    print(main())
+  File "GNN-RDM/src/gcn_distr_15d.py", line 1008, in main
+    run)
+  File "GNN-RDM/src/gcn_distr_15d.py", line 796, in init_process
+    run_outputs = fn(rank, size, inputs, adj_matrix, data, features, classes, device)
+  File "GNN-RDM/src/gcn_distr_15d.py", line 582, in run
+    row_groups, col_groups = get_proc_groups(rank, size)
+  File "GNN-RDM/src/gcn_distr_15d.py", line 414, in get_proc_groups
+    row_groups.append(dist.new_group(row_procs[i]))
+  File "/uufs/chpc.utah.edu/common/home/u1320844/anaconda3/envs/ogb/lib/python3.7/site-packages/torch/distributed/distributed_c10d.py", line 2690, in new_group
+    raise RuntimeError("the new group's world size should be less or "
+RuntimeError: the new group's world size should be less or equal to the world size set by init_process_group
+ERROR:torch.distributed.elastic.multiprocessing.api:failed (exitcode: 1) local_rank: 0 (pid: 2120835) of binary: /uufs/chpc.utah.edu/common/home/u1320844/anaconda3/envs/ogb/bin/python
+/uufs/chpc.utah.edu/common/home/u1320844/anaconda3/envs/ogb/lib/python3.7/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py:367: UserWarning: 
+
+**********************************************************************
+               CHILD PROCESS FAILED WITH NO ERROR_FILE                
+**********************************************************************
+CHILD PROCESS FAILED WITH NO ERROR_FILE
+Child process 2120835 (local_rank 0) FAILED (exitcode 1)
+Error msg: Process failed with exitcode 1
+Without writing an error file to <N/A>.
+While this DOES NOT affect the correctness of your application,
+no trace information about the error will be available for inspection.
+Consider decorating your top level entrypoint function with
+torch.distributed.elastic.multiprocessing.errors.record. Example:
+
+  from torch.distributed.elastic.multiprocessing.errors import record
+
+  @record
+  def trainer_main(args):
+     # do train
+**********************************************************************
+  warnings.warn(_no_error_file_warning_msg(rank, failure))
+Traceback (most recent call last):
+  File "/uufs/chpc.utah.edu/common/home/u1320844/anaconda3/envs/ogb/lib/python3.7/runpy.py", line 193, in _run_module_as_main
+    "__main__", mod_spec)
+  File "/uufs/chpc.utah.edu/common/home/u1320844/anaconda3/envs/ogb/lib/python3.7/runpy.py", line 85, in _run_code
+    exec(code, run_globals)
+  File "/uufs/chpc.utah.edu/common/home/u1320844/anaconda3/envs/ogb/lib/python3.7/site-packages/torch/distributed/run.py", line 702, in <module>
+    main()
+  File "/uufs/chpc.utah.edu/common/home/u1320844/anaconda3/envs/ogb/lib/python3.7/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 361, in wrapper
+    return f(*args, **kwargs)
+  File "/uufs/chpc.utah.edu/common/home/u1320844/anaconda3/envs/ogb/lib/python3.7/site-packages/torch/distributed/run.py", line 698, in main
+    run(args)
+  File "/uufs/chpc.utah.edu/common/home/u1320844/anaconda3/envs/ogb/lib/python3.7/site-packages/torch/distributed/run.py", line 692, in run
+    )(*cmd_args)
+  File "/uufs/chpc.utah.edu/common/home/u1320844/anaconda3/envs/ogb/lib/python3.7/site-packages/torch/distributed/launcher/api.py", line 116, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/uufs/chpc.utah.edu/common/home/u1320844/anaconda3/envs/ogb/lib/python3.7/site-packages/torch/distributed/launcher/api.py", line 246, in launch_agent
+    failures=result.failures,
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+***************************************
+  GNN-RDM/src/gcn_distr_15d.py FAILED  
+=======================================
+Root Cause:
+[0]:
+  time: 2022-07-12_01:35:13
+  rank: 0 (local_rank: 0)
+  exitcode: 1 (pid: 2120835)
+  error_file: <N/A>
+  msg: "Process failed with exitcode 1"
+=======================================
+Other Failures:
+  <NO_OTHER_FAILURES>
+***************************************
+
+WARNING:__main__:*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+WARNING:root:The OGB package is out of date. Your version is 1.3.2, while the latest version is 1.3.3.
+WARNING:root:The OGB package is out of date. Your version is 1.3.2, while the latest version is 1.3.3.
+Namespace(acc_csv='full.csv', accperrank=2, accuracy='True', activations='True', csv='', download=None, epochs=2000, graphname='ogbn-products', local_rank=None, midlayer=128, normalization='True', runcount=1, timing='True')
+Arguments: epochs: 2000 graph: ogbn-products timing: True mid: 128 norm: True act: True acc: True runs: 1
+notch347
+Namespace(acc_csv='full.csv', accperrank=2, accuracy='True', activations='True', csv='', download=None, epochs=2000, graphname='ogbn-products', local_rank=None, midlayer=128, normalization='True', runcount=1, timing='True')
+Arguments: epochs: 2000 graph: ogbn-products timing: True mid: 128 norm: True act: True acc: True runs: 1
+notch347
+Processes: 2
+device: cuda:0
+Processes: 2
+device: cuda:1
+slurmstepd: error: *** JOB 4924232 ON notch347 CANCELLED AT 2022-07-12T01:58:16 ***

@@ -48,6 +48,13 @@ def save_log_dir(args):
     os.makedirs(log_dir, exist_ok=True)
     return log_dir
 
+def eval(y_true, y_pred, multilabel):
+    y_pred = np.argmax(y_pred, axis=1)
+    y_pred = torch.from_numpy(y_pred)
+    y_true = torch.from_numpy(y_true)
+
+    acc = y_pred.eq(y_true).sum().item() / y_true.bool().sum().item()
+    return acc#f1_score(y_true, y_pred, average="micro")
 
 def calc_f1(y_true, y_pred, multilabel):
     if multilabel:
@@ -65,9 +72,12 @@ def evaluate(model, g, labels, mask, multilabel=False):
         logits = model(g)
         logits = logits[mask]
         labels = labels[mask]
-        f1_mic, f1_mac = calc_f1(labels.cpu().numpy(),
-                                 logits.cpu().numpy(), multilabel)
-        return f1_mic, f1_mac
+        #acc = eval(labels.cpu().numpy(),
+        #                         logits.cpu().numpy(), multilabel)
+        y_pred = np.argmax(logits, axis=1)
+        y_true = labels
+        acc = f1_score(y_true.cpu().numpy(), y_pred.cpu().numpy(), average='micro')
+        return acc 
 
 
 # load data of GraphSAINT and convert them to the format of dgl

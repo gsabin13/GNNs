@@ -4,7 +4,7 @@ ws=1
 echo "rank:"$rk
 root=127.0.0.1
 csv=$1
-for graph in ogbn-products ogbn-arxiv reddit meta arctic25 oral
+for graph in ogbn-arxiv reddit meta arctic25 oral
 do
     for ngpu in 1
     do

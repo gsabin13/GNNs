@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 from sampler import SAINTNodeSampler, SAINTEdgeSampler, SAINTRandomWalkSampler
 from config import CONFIG
 from modules import GCNNet
-from utils import Logger, evaluate, save_log_dir, load_data, calc_f1
+from utils import Logger, evaluate, save_log_dir, load_data, calc_f1, eval
 import warnings
 from tqdm import tqdm
 import numpy as np
@@ -82,38 +82,38 @@ def main(args):
     pref = '/scratch/general/nfs1/u1320844/dataset/asplos/{}_subgs/'.format(args.dataset)
     # Load subg data
     subgraphs = []
-    if args.dataset == 'reddit':
-        pref_tmp = pref
-        pref = pref_reddit
-    for i in range(32):
-        adj_ = torch.load(pref+'adj_{}.pt'.format(i))
-        x_ = torch.load(pref+'x_{}.pt'.format(i))
-        y_ = torch.load(pref+'y_{}.pt'.format(i))
-        tm_ = torch.load(pref+'train_mask_{}.pt'.format(i))
-        g = dgl.graph((adj_[0], adj_[1]))
-        g = dgl.add_self_loop(g)
-        if not g.num_nodes() == len(x_):
-            print(g.num_nodes())
-            print(x_.shape)
-            x_ = x_[:g.num_nodes()]
-            y_ = y_[:g.num_nodes()]
-            tm_ = tm_[:g.num_nodes()]
-        g.ndata['feat'] = x_
-        g.ndata['label'] = y_
-        g.ndata['train_mask'] = tm_
-        if not args.dataset in ['meta', 'arctic25', 'oral']:
-            ew_ = torch.load(pref+'edge_weight_{}.pt'.format(i))
-            #g.edata['edge_weight'] = ew_
-        subgraphs.append(g)
+#    if args.dataset == 'reddit':
+#        pref_tmp = pref
+#        pref = pref_reddit
+#    for i in range(32):
+#        adj_ = torch.load(pref+'adj_{}.pt'.format(i))
+#        x_ = torch.load(pref+'x_{}.pt'.format(i))
+#        y_ = torch.load(pref+'y_{}.pt'.format(i))
+#        tm_ = torch.load(pref+'train_mask_{}.pt'.format(i))
+#        g = dgl.graph((adj_[0], adj_[1]))
+#        g = dgl.add_self_loop(g)
+#        if not g.num_nodes() == len(x_):
+#            print(g.num_nodes())
+#            print(x_.shape)
+#            x_ = x_[:g.num_nodes()]
+#            y_ = y_[:g.num_nodes()]
+#            tm_ = tm_[:g.num_nodes()]
+#        g.ndata['feat'] = x_
+#        g.ndata['label'] = y_
+#        g.ndata['train_mask'] = tm_
+#        if not args.dataset in ['meta', 'arctic25', 'oral']:
+#            ew_ = torch.load(pref+'edge_weight_{}.pt'.format(i))
+#            #g.edata['edge_weight'] = ew_
+#        subgraphs.append(g)
 
     # load full graph
-    if args.dataset == 'reddit':
-        pref = pref_tmp
+#    if args.dataset == 'reddit':
+#        pref = pref_tmp
     adj_full = torch.load(pref+'adj_full.pt')
     x_ = torch.load(pref+'x_full.pt')
     y_ = torch.load(pref+'y_full.pt')
     trm_ = torch.load(pref+'train_mask_full.pt')
-    vam_ = torch.load(pref+'val_mask_full.pt')
+#    vam_ = torch.load(pref+'val_mask_full.pt')
     tem_ = torch.load(pref+'test_mask_full.pt')
     g = dgl.graph((adj_full[0], adj_full[1]))
     g = dgl.add_self_loop(g)
@@ -123,7 +123,7 @@ def main(args):
     g.ndata['label'] = y_
     print('Max label:', torch.max(y_))
     g.ndata['train_mask'] = trm_
-    g.ndata['val_mask'] = vam_
+#    g.ndata['val_mask'] = vam_
     g.ndata['test_mask'] = tem_
 
 # load and preprocess dataset
@@ -149,7 +149,7 @@ def main(args):
     n_nodes = g.num_nodes()
     n_edges = g.num_edges()
     n_train_samples = trm_.int().sum().item()
-    n_val_samples = vam_.int().sum().item()
+    n_val_samples = 0#vam_.int().sum().item()
     n_test_samples = tem_.int().sum().item()
 
     print("""----Data statistics------'
@@ -182,19 +182,19 @@ def main(args):
 #    loader = DataLoader(saint_sampler, collate_fn=saint_sampler.__collate_fn__, batch_size=1,
 #                        shuffle=True, num_workers=args.num_workers, drop_last=False)
 # TODO
-    loader = subgraphs
-    chunk_size = len(loader)//ws
-    if rk == ws-1:
-        l = []
-        for j in range(chunk_size):
-            l.append(loader[rk+j*ws])
-        loader = l
-        #loader = loader[rk*chunk_size:]
-    else:
-        l = []
-        for j in range(chunk_size):
-            l.append(loader[rk+j*ws])
-        loader = l
+#    loader = subgraphs
+#    chunk_size = len(loader)//ws
+#    if rk == ws-1:
+#        l = []
+#        for j in range(chunk_size):
+#            l.append(loader[rk+j*ws])
+#        loader = l
+#        #loader = loader[rk*chunk_size:]
+#    else:
+#        l = []
+#        for j in range(chunk_size):
+#            l.append(loader[rk+j*ws])
+#        loader = l
     # set device for dataset tensors
     if args.gpu < 0:
         cuda = False
@@ -205,7 +205,7 @@ def main(args):
         device_id = rank % torch.cuda.device_count()
         print("Running on: "+str(device_id))
         device = torch.device(device_id)
-        val_mask = vam_.to(device)
+        #val_mask = vam_.to(device)
         test_mask = tem_.to(device)
         if not cpu_flag:
             g = g.to(device)
@@ -245,13 +245,15 @@ def main(args):
 
     dur = []
     g = g.to(device)
+    #g.ndata['train_mask'] = trm_
+    trm = trm_.to(device)
     for epoch in range(2000):
         ep_start = time.time()
         model.train()
         # forward
         pred = model(g)
         batch_labels = g.ndata['label']
-        loss = F.cross_entropy(pred, batch_labels.long(), reduction='mean')
+        loss = F.cross_entropy(pred[trm], batch_labels[trm].long(), reduction='mean')
             #print('loss:', loss)
             #exit()
             #if multilabel:
@@ -267,14 +269,15 @@ def main(args):
         optimizer.step()
         dur.append(time.time()-ep_start)
         torch.cuda.empty_cache()
-        if rk == 0 and j == len(loader) - 1 and epoch%10==0:
+        if rk == 0:# and j == len(loader) - 1 and epoch%10==0:
             model.eval()
             with torch.no_grad():
-                train_f1_mic, train_f1_mac = calc_f1(batch_labels.cpu().numpy(),
-                                                     pred.cpu().numpy(), False)
-                print(f"epoch:{epoch + 1}/{args.n_epochs}, Iteration {j + 1}/"
-                      f"{len(loader)}:training loss", loss.item())
-                print("Train F1-mic {:.4f}, Train F1-mac {:.4f}".format(train_f1_mic, train_f1_mac))
+                #train_f1_mic, train_f1_mac = calc_f1(batch_labels.cpu().numpy(),
+                #                                     pred.cpu().numpy(), False)
+                train_f1_mic = eval(batch_labels[trm].cpu().numpy(),
+                                                     pred[trm].cpu().numpy(), False)
+                print(f"epoch:{epoch + 1}/{args.n_epochs}, training loss:{loss.item()}")
+                print("Train Acc {:.4f}".format(train_f1_mic))
         # evaluate
         model.eval()
         if epoch % 1 == 0 and rk == 0:
@@ -283,10 +286,10 @@ def main(args):
             #val_f1_mic, val_f1_mac = evaluate(
             #    model, g, labels, val_mask, multilabel)
             #g = g.to(device)
-            val_f1_mic, val_f1_mac = evaluate(
+            val_f1_mic= evaluate(
                 model, g, g.ndata['label'], test_mask, False)
             print(
-                " F1-mic {:.4f},  F1-mac {:.4f}".format(val_f1_mic, val_f1_mac))
+                " Acc {:.4f}".format(val_f1_mic))
             if val_f1_mic > best_f1:
                 best_f1 = val_f1_mic
                 print('new best val f1:', best_f1)
