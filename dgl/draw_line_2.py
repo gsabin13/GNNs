@@ -15,7 +15,7 @@ df.dropna(axis=1, inplace=True)
 col = list(df.columns)
 print(col)
 
-df_reddit = df.loc[df['Dataset']=='reddit']
+df_reddit = df.loc[df['Dataset']=='Reddit']
 df_arxiv = df.loc[df['Dataset']=='ogbn-arxiv']
 df_products = df.loc[df['Dataset']=='ogbn-products']
 df_meta = df.loc[df['Dataset']=='meta']
@@ -43,30 +43,30 @@ for xaxis in ['Time']:
     #else:
     #    g = sns.lineplot(data=df, x='Epoch', y='Test', hue='Method', palette='muted')
     #    plt.xlabel('Epoch', fontsize=20);
-        pref = 'jul10'
+        pref = 'jul12'
         #pref = 'graphsaint_comparison_figs'
         #g.set(xlim=(0, 500))
         if i == 0:
-            g.set(ylim=(0.2, 0.75))
-            g.set(xlim=(0, 50))
-            output = f'{pref}/arxiv_saint_{xaxis}.pdf'
+            g.set(ylim=(0, 0.75))
+            #g.set(xlim=(0, 50))
+            output = f'{pref}/arxiv_{xaxis}.png'
         elif i==1: 
             g.set(ylim=(0.8, 0.97))
-            output = f'{pref}/reddit_saint_{xaxis}.pdf'
-            g.set(xlim=(0, 40))
+            output = f'{pref}/reddit_{xaxis}.png'
+            #g.set(xlim=(0, 40))
         elif i==2:
             g.set(ylim=(0.2, 0.9))
-            output = f'{pref}/products_saint_{xaxis}.pdf'
-            g.set(xlim=(0, 40))
+            output = f'{pref}/products_{xaxis}.png'
+            #g.set(xlim=(0, 40))
         elif i==3:
-            output = f'{pref}/meta_saint_{xaxis}.pdf'
-            g.set(xlim=(0, 100))
+            output = f'{pref}/meta_{xaxis}.png'
+            #g.set(xlim=(0, 100))
         elif i==4:
-            output = f'{pref}/arctic25_saint_{xaxis}500.png'
-            g.set(xlim=(0, 100))
+            output = f'{pref}/arctic25_{xaxis}.png'
+            #g.set(xlim=(0, 100))
         elif i==5:
-            output = f'{pref}/oral_saint_{xaxis}500.png'
-            g.set(xlim=(0, 100))
+            output = f'{pref}/oral_{xaxis}.png'
+            #g.set(xlim=(0, 100))
     #    if i == 0:
     #        g.set(ylim=(0, 0.8))
     #        g.set(xlim=(0, 50))

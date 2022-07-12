@@ -1,10 +1,11 @@
 #!/bin/bash -x
 #SBATCH -M notchpeak
-#SBATCH --account=notchpeak-gpu
-#SBATCH --partition=notchpeak-gpu
+#SBATCH --account=owner-gpu-guest
+#SBATCH --partition=notchpeak-gpu-guest
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:a100:1
+#SBATCH --gres=gpu:a100:2
 #SBATCH -c 16
+#SBATCH -w notch347 
 #SBATCH --mem=0
 #SBATCH --exclusive
 #SBATCH -t 48:00:00
@@ -22,4 +23,5 @@ unset __conda_setup
 conda activate ogb
 module load gcc/9.2.0
 module load cuda/11.0
-sh run.sh sh GNN-RDM/genacc_rdm.sh 
+sleep 3d
+#sh run.sh sh GNN-RDM/genacc_rdm.sh 

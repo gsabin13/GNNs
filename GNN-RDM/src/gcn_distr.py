@@ -351,7 +351,7 @@ def train(inputs, weight1, weight2, adj_matrix, am_partitions, optimizer, data, 
     # loss = F.nll_loss(outputs[data.train_mask.bool()], data.y[data.train_mask.bool()])
     if list(datay_rank[rank_train_mask].size())[0] > 0:
     # if datay_rank.size(0) > 0:
-        loss = F.nll_loss(outputs[rank_train_mask], datay_rank[rank_train_mask])
+        loss = F.nll_loss(outputs[rank_train_mask], datay_rank[rank_train_mask].long())
         # loss = F.nll_loss(outputs, torch.max(datay_rank, 1)[1])
         loss.backward()
     else:
@@ -792,6 +792,34 @@ def main():
         edge_index = data.edge_index
         num_features = dataset.num_features
         num_classes = dataset.num_classes
+    elif graphname in ['meta', 'arctic25', 'oral']:
+        pref = '/scratch/general/nfs1/u1320844/dataset/asplos/{}_subgs/'.format(graphname)
+        adj_full = torch.load(pref+'adj_full.pt')
+        x_full = torch.load(pref+'x_full.pt')
+        y_full = torch.load(pref+'y_full.pt')
+        print(f'{graphname}, {len(adj_full[0])}, {len(x_full)}, {len(adj_full[0])/len(x_full)}')
+#        exit()
+
+        train_mask_full = torch.load(pref+'train_mask_full.pt')
+        val_mask_full = torch.load(pref+'val_mask_full.pt')
+        test_mask_full = torch.load(pref+'test_mask_full.pt')
+        data = Data()
+        data.edge_index = adj_full
+        data.x = x_full
+        data.y = y_full
+        data.x.requires_grad = True
+        data.train_mask = train_mask_full
+        data.val_mask = val_mask_full
+        data.test_mask = test_mask_full
+        inputs = data.x.to(device)
+        data.y = data.y.to(device)
+        edge_index = data.edge_index
+        num_features = x_full.shape[-1]
+        tmp = {}
+        tmp['meta'] = 25
+        tmp['oral'] = 32 
+        tmp['arctic25'] = 33
+        num_classes = tmp[graphname]
     elif graphname == "Reddit":
         path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data', graphname)
         path = '/scratch/general/nfs1/u1320844/dataset'
