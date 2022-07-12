@@ -54482,3 +54482,20 @@ Other Failures:
   <NO_OTHER_FAILURES>
 ***************************************
 
+[master efb54c0] Jul12-02:02:30-MDT2022
+ 18 files changed, 72540 insertions(+), 66 deletions(-)
+ create mode 100644 full_new.csv
+ create mode 100644 log/reddit/test/loggings
+ create mode 100644 slurm-4924843.out
+ create mode 100644 slurm-4924845.out
+ create mode 100644 test_acc_dgl.csv
+remote: error: Trace: f04c392616d40618b0df5b37cb2653af1b7eb1652a7508785cf27c6a94c05361        
+remote: error: See http://git.io/iEPt8g for more information.        
+remote: error: File oral_adj_part_rk0 is 414.56 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: File arctic25_adj_part_rk0 is 880.77 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: File meta_adj_part_rk0 is 994.57 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
+To github.com:JoseYan/GNNs.git
+ ! [remote rejected] master -> master (pre-receive hook declined)
+error: failed to push some refs to 'github.com:JoseYan/GNNs.git'
+run.sh: line 28: pushd: ../GNN_logs: No such file or directory
