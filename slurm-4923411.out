@@ -61295,3 +61295,29 @@ Other Failures:
   msg: "Process failed with exitcode 1"
 *************************************************
 
+[master 4cd566e] Jul12-08:54:20-MDT2022
+ 22 files changed, 139162 insertions(+), 40189 deletions(-)
+ create mode 100644 a
+ create mode 100644 dgl/a
+ create mode 100644 dgl/draw_legend.py
+ create mode 100644 dgl/legend.pdf
+ create mode 100644 dgl/legend.png
+ create mode 100644 full_348.csv
+ rewrite full_new.csv (67%)
+ create mode 100644 jul12/arctic25_Time.png
+ create mode 100644 jul12/arxiv_Time.png
+ create mode 100644 jul12/meta_Time.png
+ create mode 100644 jul12/oral_Time.png
+ create mode 100644 jul12/products_Time.png
+ create mode 100644 jul12/reddit_Time.png
+ create mode 100644 slurm-4925473.out
+remote: error: Trace: 9b6d33064391b4c4160eb9e14ba4300720d8a6e1b710fe6d07f93c15853a0984        
+remote: error: See http://git.io/iEPt8g for more information.        
+remote: error: File oral_adj_part_rk0 is 414.56 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: File arctic25_adj_part_rk0 is 880.77 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: File meta_adj_part_rk0 is 994.57 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
+To github.com:JoseYan/GNNs.git
+ ! [remote rejected] master -> master (pre-receive hook declined)
+error: failed to push some refs to 'github.com:JoseYan/GNNs.git'
+run.sh: line 28: pushd: ../GNN_logs: No such file or directory
