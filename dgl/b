@@ -1,0 +1,4 @@
+Dataset,Method-GPU,Epoch,Time,Acc
+i,GraphSAINT-DGL,1,1,1
+i,GraphSAINT-RDM,1,1,1
+i,GCN-RDM,1,1,1

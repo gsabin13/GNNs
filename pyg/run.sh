@@ -1,4 +1,4 @@
-for data in reddit
+for data in ogbn-mag 
 do
     python graphsaint_sequential.py --dataset $data --batch_size 4000 --num_subgs 32 --log ddp_kp_$data.csv --save
 done

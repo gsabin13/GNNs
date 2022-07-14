@@ -377,6 +377,7 @@ def train(inputs, weight1, weight2, adj_matrix, am_partitions, optimizer, data, 
 def test(outputs, data, vertex_count, rank):
     logits, accs = outputs, []
     for _, mask in data('train_mask', 'val_mask', 'test_mask'):
+        mask = mask.bool()
         pred = logits[mask].max(1)[1]
         acc = pred.eq(data.y[mask]).sum().item() / mask.sum().item()
         accs.append(acc)
@@ -662,20 +663,23 @@ def run(rank, size, inputs, adj_matrix, data, features, classes, device):
             if len(args.acc_csv)>2:
                 # All-gather outputs to test accuracy
                 output_parts = []
-                n_per_proc = math.ceil(float(inputs.size(0)) / size)
+                # n_per_proc = math.ceil(float(inputs.size(0)) / size)
+                n_per_proc = math.ceil(float(inputs.size(0)) / (size / replication))
                 # print(f"rows: {am_pbyp[-1].size(0)} cols: {classes}", flush=True)
-                for i in range(size):
+                for i in range(size // replication):
                     output_parts.append(torch.cuda.FloatTensor(n_per_proc, classes, device=device).fill_(0))
 
                 if outputs.size(0) != n_per_proc:
-                    pad_row = n_per_proc - outputs.size(0)
+                    pad_row = n_per_proc - outputs.size(0) 
                     outputs = torch.cat((outputs, torch.cuda.FloatTensor(pad_row, classes, device=device)), dim=0)
 
-                dist.all_gather(output_parts, outputs)
-                output_parts[rank] = outputs
+                # dist.all_gather(output_parts, outputs)
+                dist.all_gather(output_parts, outputs, group=col_groups[rank_col])
+                # output_parts[rank] = outputs
+                output_parts[rank_c] = outputs
 
-                padding = inputs.size(0) - n_per_proc * (size - 1)
-                output_parts[size - 1] = output_parts[size - 1][:padding,:]
+                padding = inputs.size(0) - n_per_proc * ((size // replication) - 1)
+                output_parts[(size // replication) - 1] = output_parts[(size // replication) - 1][:padding,:]
 
                 outputs = torch.cat(output_parts, dim=0)
 

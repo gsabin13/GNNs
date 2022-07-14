@@ -25,8 +25,8 @@ def setup(rank, world_size):
     #os.environ['MASTER_ADDR'] = 'localhost'
     #os.environ['MASTER_PORT'] = '12355'
     # initialize the process group
-    dist.init_process_group("gloo", rank=rank, world_size=world_size)
-    #dist.init_process_group("nccl", rank=rank, world_size=world_size)
+    #dist.init_process_group("gloo", rank=rank, world_size=world_size)
+    dist.init_process_group("nccl", rank=rank, world_size=world_size)
 
 def cleanup():
     dist.destroy_process_group()
@@ -141,6 +141,7 @@ def main(args):
     nclassdict['reddit'] = 41
     nclassdict['ogbn-arxiv'] = 40
     nclassdict['ogbn-products'] = 47
+    nclassdict['ogbn-mag'] = 349
     nclassdict['meta'] = 25 
     nclassdict['arctic25'] = 33
     nclassdict['oral'] = 32 
@@ -264,6 +265,8 @@ def main(args):
             #    loss = (subg.ndata['l_n'] * loss).sum()
 
             optimizer.zero_grad()
+            #print('loss:', loss.item())
+            #exit()
             loss.backward()
             torch.nn.utils.clip_grad_norm(model.parameters(), 5)
             optimizer.step()
@@ -284,10 +287,10 @@ def main(args):
                 model = model.to('cpu')
             #val_f1_mic, val_f1_mac = evaluate(
             #    model, g, labels, val_mask, multilabel)
-            val_f1_mic, val_f1_mac = evaluate(
+            val_f1_mic = evaluate(
                 model, g, g.ndata['label'], test_mask, False)
             print(
-                " F1-mic {:.4f},  F1-mac {:.4f}".format(val_f1_mic, val_f1_mac))
+                " F1-mic {:.4f}".format(val_f1_mic))
             if val_f1_mic > best_f1:
                 best_f1 = val_f1_mic
                 print('new best val f1:', best_f1)
@@ -310,9 +313,9 @@ def main(args):
     #        log_dir, 'best_model_{}.pkl'.format(task))))
     if cpu_flag and cuda:
         model = model.to('cpu')
-    test_f1_mic, test_f1_mac = evaluate(
+    test_f1_mic = evaluate(
         model, g, g.ndata['label'], test_mask, False)
-    print("Test F1-mic {:.4f}, Test F1-mac {:.4f}".format(test_f1_mic, test_f1_mac))
+    print("Test F1-mic {:.4f}".format(test_f1_mic))
 
 if __name__ == '__main__':
     warnings.filterwarnings('ignore')

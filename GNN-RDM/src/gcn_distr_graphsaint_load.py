@@ -1194,7 +1194,7 @@ def run(rank, size, inputs, graphs, data, features, classes, device, orig_adj=No
                     logline = f'{graphname},RDM-{ws},{epoch:02d},{cumulative_time:.4f},loss:-1,{train_acc:.4f},{val_acc:.4f},{test_acc:.4f}\n'
                     print(logline)
                     logline = f'{graphname},RDM-{LR}-{ws}-ns,{epoch:02d},{cumulative_time:.4f},{tmp_test_acc:.4f}\n'
-                    with open('rdm_acc_500_notch347.csv','a') as ff:
+                    with open('test.csv','a') as ff:
                         ff.write(logline)
                 dist.barrier(group)
         tstop = time.time()
@@ -1344,7 +1344,7 @@ def main():
     #    #data.y = data.y.to(device)
     #    edge_index, _ = coo_scipy2stack(adj_full_norm.tocoo())
     #    print(edge_index)
-    elif graphname in ['Flickr', 'reddit', 'products', 'arxiv', 'meta','arctic25', 'oral']:
+    elif graphname in ['Flickr', 'reddit', 'products', 'arxiv', 'meta','arctic25', 'oral','mag']:
         # TODO use graphsaint to sample and store subgraphs
        #if not graphname in ['products', 'reddit']:
        #    prefix = '/scratch/general/nfs1/u1320844/dataset/graphsaint/{}'.format(graphname.lower())
@@ -1423,8 +1423,12 @@ def main():
        #         torch.save(norm_loss, 'subgs-reddit/norm_loss_{}.pt'.format(i))
        #         print('subg {} saved'.format(i))
        #     print('subgs saved')
-        if graphname in ['meta', 'arctic25', 'oral']:
-            pref = '/scratch/general/nfs1/u1320844/dataset/asplos/{}_subgs/'.format(graphname)
+        if graphname in ['meta', 'arctic25', 'oral','mag']:
+            if graphname=='mag':
+                graphname1 = 'ogbn-mag'
+            else:
+                graphname1 = graphname
+            pref = '/scratch/general/nfs1/u1320844/dataset/asplos/{}_subgs/'.format(graphname1)
             adj_full = torch.load(pref+'adj_full.pt')
             x_full = torch.load(pref+'x_full.pt')
             y_full = torch.load(pref+'y_full.pt')
@@ -1448,6 +1452,7 @@ def main():
             tmp['meta'] = 25
             tmp['oral'] = 32 
             tmp['arctic25'] = 33
+            tmp['mag'] = 349
             num_classes = tmp[graphname]
             num_features=data.x.size(1)
             num_nodes = len(data.x)
@@ -1505,6 +1510,8 @@ def main():
         #pref = '/uufs/chpc.utah.edu/common/home/u1320844/OGB_models/ogb/examples/nodeproppred/reddit/reddit_subgs/'
         if 'arxiv' in graphname or 'products' in graphname:
             gg = 'ogbn-{}'.format(graphname)
+        elif graphname == 'mag':
+            gg = graphname1
         else:
             gg = graphname
         #pref = '/uufs/chpc.utah.edu/common/home/u1320844/OGB_models/ogb/examples/nodeproppred/new/{}_subgs/'.format(gg.lower())

@@ -71,6 +71,39 @@ elif args.dataset == 'ogbn-products':
             key = 'val'
         data[f'{key}_mask'] = mask
 
+elif args.dataset == 'ogbn-mag':
+    path = '/scratch/general/nfs1/u1320844/dataset'
+    dataset = PygNodePropPredDataset(name=args.dataset, root=path)
+    rel_data = dataset[0]
+    # only train with paper <-> paper relations.
+    data = Data(
+        x=rel_data.x_dict['paper'],
+        edge_index=rel_data.edge_index_dict[('paper', 'cites', 'paper')],
+        y=rel_data.y_dict['paper'])
+    data = T.NormalizeFeatures()(data)
+    split_idx = dataset.get_idx_split()
+    train_idx = split_idx['train']['paper']
+    val_idx = split_idx['valid']['paper']
+    test_idx = split_idx['test']['paper']
+    data.y = data.y.squeeze(dim=1)
+    ## Convert split indices to boolean masks and add them to `data`.
+    #for key, idx in split_idx.items():
+    #    mask = torch.zeros(data.num_nodes, dtype=torch.bool)
+    #    mask[idx] = True
+    #    if key=='valid':
+    #        key = 'val'
+    #    data[f'{key}_mask'] = mask
+    train_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
+    train_mask[train_idx] = True
+    val_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
+    val_mask[val_idx] = True
+    test_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
+    test_mask[test_idx] = True
+    data['train_mask'] = train_mask
+    data['val_mask'] = val_mask
+    data['test_mask'] = test_mask
+    print('Dataset built')
+
 row, col = data.edge_index
 data.edge_weight = 1. / degree(col, data.num_nodes)[col]  # Norm by in-degree.
 # save full graph
@@ -255,6 +288,7 @@ def train():
     total_loss = total_examples = 0
     for i, data in enumerate(loader):
         if args.save:
+            print('Saving {}'.format(i))
             dir_ ='{}_subgs'.format(args.dataset)
             if not osp.exists(dir_):
                 os.mkdir(dir_)

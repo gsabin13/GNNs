@@ -1,6 +1,6 @@
-for data in oral
+for data in ogbn-mag 
 do
-    for ngpu in 4 8
+    for ngpu in 8
     do
         for hidden in 128 
         do

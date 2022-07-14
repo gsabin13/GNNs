@@ -21,6 +21,7 @@ df_products = df.loc[df['Dataset']=='ogbn-products']
 df_meta = df.loc[df['Dataset']=='meta']
 df_arctic25 = df.loc[df['Dataset']=='arctic25']
 df_oral = df.loc[df['Dataset']=='oral']
+#df_mag = df.loc[df['Dataset']=='ogbn-mag']
 
 # gpu=8
 
@@ -33,40 +34,47 @@ df_oral = df.loc[df['Dataset']=='oral']
 
 
 sns.set_style("whitegrid")
+from matplotlib import rcParams
+print(rcParams['figure.figsize'])
+rcParams['figure.figsize'] = 10,6
 for xaxis in ['Time']:
     for i, df in enumerate([df_arxiv, df_reddit, df_products, df_meta, df_arctic25, df_oral]):
         #df_ = df.loc[(df['Method-GPU']=='GraphSAINT-DGL')| (df['Method-GPU']=='GraphSAINT-DGL')|(df['Method-GPU']=='GCN-RDM') ]
         #df_ = df.loc[(df['Method-GPU']=='GraphSAINT-DGL')| (df['Method-GPU']=='GraphSAINT-DGL')|(df['Method-GPU']=='GCN-RDM') ]
-        #g = sns.lineplot(data=df, x=xaxis, y='Acc', hue='Method-GPU', palette='muted',hue_order=["GraphSAINT-DGL","GraphSAINT-RDM","GCN-RDM"])
+        #g = sns.lineplot(data=df, x=xaxis, y='Acc', hue='Method-GPU', palette='muted',hue_order=["GraphSAINT-DGL","GraphSAINT-RDM","GCN-RDM"],linewidth=3)
         g = sns.lineplot(data=df, x=xaxis, y='Acc', hue='Method-GPU', palette='muted')
-        plt.xlabel(xaxis, fontsize=20);
+        plt.xlabel(xaxis, fontsize=28);
     #else:
     #    g = sns.lineplot(data=df, x='Epoch', y='Test', hue='Method', palette='muted')
     #    plt.xlabel('Epoch', fontsize=20);
-        pref = 'jul12'
+        pref = 'jul13'
         #pref = 'graphsaint_comparison_figs'
         #g.set(xlim=(0, 500))
         if i == 0:
-            g.set(ylim=(0, 0.75))
+            #g.set(ylim=(0.2, 0.75))
             #g.set(xlim=(0, 50))
             output = f'{pref}/arxiv_{xaxis}.png'
         elif i==1: 
-            g.set(ylim=(0.8, 0.97))
+            g.set(ylim=(0.87, 0.97))
             output = f'{pref}/reddit_{xaxis}.png'
             #g.set(xlim=(0, 40))
         elif i==2:
-            g.set(ylim=(0.2, 0.9))
+            #g.set(ylim=(0.2, 0.9))
             output = f'{pref}/products_{xaxis}.png'
             #g.set(xlim=(0, 40))
         elif i==3:
-            output = f'{pref}/meta_{xaxis}.png'
+            output = f'{pref}/airways_{xaxis}.png'
             #g.set(xlim=(0, 100))
         elif i==4:
             output = f'{pref}/arctic25_{xaxis}.png'
             #g.set(xlim=(0, 100))
         elif i==5:
+            g.set(ylim=(0.4, 0.9))
             output = f'{pref}/oral_{xaxis}.png'
             #g.set(xlim=(0, 100))
+#        elif i==6:
+#            output = f'{pref}/mag_{xaxis}.pdf'
+#            g.set(xlim=(0, 150))
     #    if i == 0:
     #        g.set(ylim=(0, 0.8))
     #        g.set(xlim=(0, 50))
@@ -77,9 +85,10 @@ for xaxis in ['Time']:
     #    else:
     #        g.set(ylim=(0, 0.85))
     #        output = 'products.png'
-        plt.ylabel('Test Accuracy', fontsize=20);
-        plt.legend(fontsize=14)
-        plt.tick_params(axis='both', which='major', labelsize=14)
+        plt.ylabel('Test Accuracy', fontsize=28);
+        plt.legend(fontsize=24)
+#        plt.legend([],[], frameon=False)
+        plt.tick_params(axis='both', which='major', labelsize=22)
         plt.tight_layout()
         plt.savefig(output)
         plt.clf()
