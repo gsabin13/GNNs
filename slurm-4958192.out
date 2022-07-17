@@ -578,3 +578,16 @@ Other Failures:
   <NO_OTHER_FAILURES>
 ***************************************
 
+[master 6fe0c60] Jul17-16:37:36-MDT2022
+ 11 files changed, 588 insertions(+), 52938 deletions(-)
+ delete mode 100644 a
+ create mode 100644 jul13/airways_Epoch.png
+ create mode 100644 jul13/arctic25_Epoch.png
+ create mode 100644 jul13/arxiv_Epoch.png
+ create mode 100644 jul13/oral_Epoch.png
+ create mode 100644 jul13/products_Epoch.png
+ create mode 100644 jul13/reddit_Epoch.png
+ create mode 100644 slurm-4958192.out
+To github.com:JoseYan/GNNs.git
+   053a25b..6fe0c60  master -> master
+run.sh: line 28: pushd: ../GNN_logs: No such file or directory
