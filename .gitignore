@@ -1,1 +1,6 @@
 *rk0
+*.csv
+*.pt
+*.tar
+fig11_2
+log/

@@ -37,7 +37,7 @@ sns.set_style("whitegrid")
 from matplotlib import rcParams
 print(rcParams['figure.figsize'])
 rcParams['figure.figsize'] = 10,6
-for xaxis in ['Time']:
+for xaxis in ['Epoch']:
     for i, df in enumerate([df_arxiv, df_reddit, df_products, df_meta, df_arctic25, df_oral]):
         #df_ = df.loc[(df['Method-GPU']=='GraphSAINT-DGL')| (df['Method-GPU']=='GraphSAINT-DGL')|(df['Method-GPU']=='GCN-RDM') ]
         #df_ = df.loc[(df['Method-GPU']=='GraphSAINT-DGL')| (df['Method-GPU']=='GraphSAINT-DGL')|(df['Method-GPU']=='GCN-RDM') ]

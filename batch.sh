@@ -23,5 +23,5 @@ conda activate ogb
 module load gcc/9.2.0
 module load cuda/11.0
 
-#sh run.sh sh dgl/run_dgl.sh full_new.csv
-sh run.sh sh GNN-RDM/genacc_rdm.sh 
+sh run.sh sh dgl/run_dgl.sh full_new.csv
+#sh run.sh sh GNN-RDM/genacc_rdm.sh 
