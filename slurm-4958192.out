@@ -591,3 +591,8 @@ Other Failures:
 To github.com:JoseYan/GNNs.git
    053a25b..6fe0c60  master -> master
 run.sh: line 28: pushd: ../GNN_logs: No such file or directory
+[master aa42e66] Jul17-16:37:36-MDT2022
+ 1 file changed, 13 insertions(+)
+To github.com:JoseYan/GNNs.git
+   6fe0c60..aa42e66  master -> master
+run.sh: line 32: popd: directory stack empty
