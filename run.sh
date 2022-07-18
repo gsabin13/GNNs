@@ -25,7 +25,7 @@ $cmd | tee $prog_output
 git add .
 git commit -m $dt
 git push origin master
-pushd ../GNN_logs
+pushd ../GNNs_log
 git add .
 git commit -m $dt
 git push origin master
