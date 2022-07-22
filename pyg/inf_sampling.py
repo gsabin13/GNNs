@@ -169,7 +169,7 @@ def train(epoch):
 
         optimizer.zero_grad()
         out = model(x[n_id], adjs)
-        loss = F.nll_loss(out, y[n_id[:batch_size]])
+        loss = F.nll_loss(out, y[n_id[:batch_size]].long())
         loss.backward()
         optimizer.step()
 
