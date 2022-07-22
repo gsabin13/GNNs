@@ -1,1 +1,1 @@
-Namespace(csv='test', dataset='meta', gpu=0, log_dir='test', lr=0.001, n_epochs=50, n_hidden=128, online=False)
+Namespace(csv='test', dataset='meta', gpu=0, log_dir='test', lr=0.001, n_epochs=50, n_hidden=128, online=False)Namespace(csv='l', dataset='meta', gpu=0, log_dir='test', lr=0.001, n_epochs=50, n_hidden=128, online=False)Namespace(csv='l', dataset='meta', gpu=0, log_dir='test', lr=0.001, n_epochs=50, n_hidden=128, online=False)

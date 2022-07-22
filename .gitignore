@@ -4,3 +4,4 @@
 *.tar
 fig11_2
 log/
+*.out

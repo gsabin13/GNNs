@@ -3,7 +3,7 @@
 #SBATCH --account=owner-gpu-guest
 #SBATCH --partition=notchpeak-gpu-guest
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:a100:2
+#SBATCH --gres=gpu:a100:1
 #SBATCH -c 16
 #SBATCH --mem=0
 #SBATCH --exclusive
@@ -23,6 +23,7 @@ conda activate ogb
 module load gcc/9.2.0
 module load cuda/11.0
 
-sh run.sh sleep 1s
+sh run.sh python pyg/inf_sampling_nonogb.py reddit
+sh run.sh python pyg/inf_sampling.py ogbn-papers100M
 #sh run.sh sh dgl/run_dgl.sh full_new.csv
 #sh run.sh sh GNN-RDM/genacc_rdm.sh 

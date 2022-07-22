@@ -15,7 +15,6 @@ from torch_geometric.utils import remove_self_loops, add_remaining_self_loops, t
 import torch_geometric.transforms as T
 
 from ogb.nodeproppred import PygNodePropPredDataset, Evaluator
-
 import torch.multiprocessing as mp
 
 from torch.multiprocessing import Manager, Process
@@ -351,7 +350,7 @@ def train(inputs, weight1, weight2, adj_matrix, am_partitions, optimizer, data, 
     # loss = F.nll_loss(outputs[data.train_mask.bool()], data.y[data.train_mask.bool()])
     if list(datay_rank[rank_train_mask].size())[0] > 0:
     # if datay_rank.size(0) > 0:
-        loss = F.nll_loss(outputs[rank_train_mask], datay_rank[rank_train_mask].long())
+        loss = F.nll_loss(outputs[rank_train_mask], datay_rank[rank_train_mask])
         # loss = F.nll_loss(outputs, torch.max(datay_rank, 1)[1])
         loss.backward()
     else:
@@ -366,8 +365,8 @@ def train(inputs, weight1, weight2, adj_matrix, am_partitions, optimizer, data, 
 def test(outputs, data, vertex_count, rank):
     logits, accs = outputs, []
     for _, mask in data('train_mask', 'val_mask', 'test_mask'):
-        pred = logits[mask.bool()].max(1)[1]
-        acc = pred.eq(data.y[mask.bool()]).sum().item() / mask.sum().item()
+        pred = logits[mask].max(1)[1]
+        acc = pred.eq(data.y[mask]).sum().item() / mask.sum().item()
         accs.append(acc)
 
     if len(accs) == 1:
@@ -817,7 +816,7 @@ def main():
         num_features = x_full.shape[-1]
         tmp = {}
         tmp['meta'] = 25
-        tmp['oral'] = 32 
+        tmp['oral'] = 32
         tmp['arctic25'] = 33
         num_classes = tmp[graphname]
     elif graphname == "Reddit":

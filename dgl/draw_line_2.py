@@ -47,17 +47,21 @@ for xaxis in ['Epoch']:
     #else:
     #    g = sns.lineplot(data=df, x='Epoch', y='Test', hue='Method', palette='muted')
     #    plt.xlabel('Epoch', fontsize=20);
-        pref = 'jul13'
+        pref = 'jul21'
         #pref = 'graphsaint_comparison_figs'
         #g.set(xlim=(0, 500))
         if i == 0:
             #g.set(ylim=(0.2, 0.75))
             #g.set(xlim=(0, 50))
             output = f'{pref}/arxiv_{xaxis}.png'
+            plt.legend(title='ogbn-arxiv',fontsize=24)
+            plt.setp(g.get_legend().get_title(), fontsize='20')
         elif i==1: 
-            g.set(ylim=(0.87, 0.97))
+#            g.set(ylim=(0.87, 0.97))
             output = f'{pref}/reddit_{xaxis}.png'
-            #g.set(xlim=(0, 40))
+            plt.legend(title='Reddit',fontsize=24)
+            plt.setp(g.get_legend().get_title(), fontsize='20')
+            g.set(xlim=(0, 250))
         elif i==2:
             #g.set(ylim=(0.2, 0.9))
             output = f'{pref}/products_{xaxis}.png'
@@ -86,7 +90,6 @@ for xaxis in ['Epoch']:
     #        g.set(ylim=(0, 0.85))
     #        output = 'products.png'
         plt.ylabel('Test Accuracy', fontsize=28);
-        plt.legend(fontsize=24)
 #        plt.legend([],[], frameon=False)
         plt.tick_params(axis='both', which='major', labelsize=22)
         plt.tight_layout()

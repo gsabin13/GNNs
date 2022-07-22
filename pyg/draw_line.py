@@ -7,34 +7,66 @@ from mpl_toolkits.axes_grid.parasite_axes import SubplotHost
 import seaborn as sns
 
 filename = sys.argv[1]
-output = sys.argv[2]
-t = sys.argv[3]=='t'
-
+#output = sys.argv[2]
+#t = sys.argv[3]=='t'
 
 df = pd.read_csv(filename)
 df.dropna(axis=1, inplace=True)
 col = list(df.columns)
 print(col)
-sns.set_style("whitegrid")
-if t:
-    g = sns.lineplot(data=df, x='Time', y='Test', hue='Method', palette='muted')
-    plt.xlabel('Time (seconds)', fontsize=20);
-else:
-    g = sns.lineplot(data=df, x='Epoch', y='Test', hue='Method', palette='muted')
-    plt.xlabel('Epoch', fontsize=20);
-#if 'rxiv' in sys.argv[1]:
-#    g.set(xlim=(0, 100))
-#else:
-#    g.set(xlim=(0, 150))
 
-if 'EDD'.lower() in sys.argv[1].lower():
-    g.set(ylim=(0.88, 0.97))
-elif 'fl' in sys.argv[1]:
-    g.set(ylim=(0.3, 0.55))
-else:
-    g.set(ylim=(0.5, 0.8))
-plt.ylabel('Test Accuracy', fontsize=20);
-plt.legend(fontsize=14)
-plt.tick_params(axis='both', which='major', labelsize=14)
-plt.tight_layout()
-plt.savefig(output)
+df_reddit = df.loc[df['Dataset']=='reddit']
+df_arxiv = df.loc[df['Dataset']=='ogbn-arxiv']
+df_products = df.loc[df['Dataset']=='ogbn-products']
+df_meta = df.loc[df['Dataset']=='meta']
+df_arctic25 = df.loc[df['Dataset']=='arctic25']
+df_oral = df.loc[df['Dataset']=='oral']
+
+# gpu=8
+
+sns.set_style("whitegrid")
+for xaxis in ['Time', 'Epoch']:
+    for i, df in enumerate([df_arxiv, df_products]):
+        g = sns.lineplot(data=df, x=xaxis, y='Acc', hue='Method', palette='muted')
+        plt.xlabel(xaxis, fontsize=20);
+    #else:
+    #    g = sns.lineplot(data=df, x='Epoch', y='Test', hue='Method', palette='muted')
+    #    plt.xlabel('Epoch', fontsize=20);
+        pref = 'graphsaint_figs'
+        if i == 0:
+            g.set(ylim=(0, 0.8))
+            g.set(xlim=(0, 50))
+            output = f'{pref}/arxiv_saint_{xaxis}.png'
+        elif i==1: 
+            g.set(ylim=(0.8, 0.97))
+            output = f'{pref}/reddit_saint_{xaxis}.png'
+            g.set(xlim=(0, 100))
+        elif i==2:
+            g.set(ylim=(0, 0.85))
+            output = f'{pref}/products_saint_{xaxis}.png'
+            g.set(xlim=(0, 40))
+        elif i==3:
+            output = f'{pref}/meta_saint_{xaxis}.png'
+            g.set(xlim=(0, 100))
+        elif i==4:
+            output = f'{pref}/arctic25_saint_{xaxis}.png'
+            g.set(xlim=(0, 100))
+        elif i==5:
+            output = f'{pref}/oral_saint_{xaxis}.png'
+            g.set(xlim=(0, 100))
+    #    if i == 0:
+    #        g.set(ylim=(0, 0.8))
+    #        g.set(xlim=(0, 50))
+    #        output = 'arxiv.png'
+    #    elif i==1: 
+    #        g.set(ylim=(0.8, 0.97))
+    #        output = 'reddit.png'
+    #    else:
+    #        g.set(ylim=(0, 0.85))
+    #        output = 'products.png'
+        plt.ylabel('Test Accuracy', fontsize=20);
+        plt.legend(fontsize=14)
+        plt.tick_params(axis='both', which='major', labelsize=14)
+        plt.tight_layout()
+        plt.savefig(output)
+        plt.clf()
