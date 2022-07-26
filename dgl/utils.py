@@ -72,11 +72,18 @@ def evaluate(model, g, labels, mask, multilabel=False):
         logits = model(g)
         logits = logits[mask]
         labels = labels[mask]
+        logits = torch.argmax(logits, dim=1)
+        #print('logits:', logits)
+        #print('labels:', labels)
+        #print('mask:', mask.bool().sum().item())
+        #print('correct:',logits.eq(labels).sum().item() )
+        #exit()
+        acc = logits.eq(labels).sum().item() / mask.bool().sum().item()
         #acc = eval(labels.cpu().numpy(),
         #                         logits.cpu().numpy(), multilabel)
-        y_pred = np.argmax(logits.cpu().numpy(), axis=1)
-        y_true = labels
-        acc = f1_score(y_true.cpu().numpy(), y_pred, average='micro')
+        #y_pred = np.argmax(logits.cpu().numpy(), axis=1)
+        #y_true = labels
+        #acc = f1_score(y_true.cpu().numpy(), y_pred, average='micro')
         return acc 
 
 

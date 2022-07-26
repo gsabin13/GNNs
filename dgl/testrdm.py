@@ -4,6 +4,7 @@ import argparse
 
 import math
 import random
+from tkinter import E
 
 import torch
 import torch.distributed as dist
@@ -11,8 +12,9 @@ import torch.distributed as dist
 from torch_geometric.data import Data, Dataset
 from torch_geometric.datasets import Planetoid, PPI
 from ogb.nodeproppred import PygNodePropPredDataset, Evaluator
+from torch_geometric.utils import degree
 #from reddit import Reddit
-from torch_geometric.utils import remove_self_loops, add_remaining_self_loops, to_dense_adj, dense_to_sparse, to_scipy_sparse_matrix
+from torch_geometric.utils import remove_self_loops, add_remaining_self_loops, to_dense_adj, dense_to_sparse, to_scipy_sparse_matrix, to_undirected
 import torch_geometric.transforms as T
 
 import torch.multiprocessing as mp
@@ -83,6 +85,26 @@ run = 0
 download = False
 ht = True
 mmorder = "dsds"
+
+
+def gcn_norm(edge_index, edge_weight=None, num_nodes=None, improved=False,
+             add_self_loops=True, dtype=None):
+    fill_value = 2. if improved else 1.
+    #num_nodes = maybe_num_nodes(edge_index, num_nodes)
+    if edge_weight is None:
+         edge_weight = torch.ones((edge_index.size(1), ), dtype=dtype,
+                                  device=edge_index.device)
+    if add_self_loops:
+         edge_index, tmp_edge_weight = add_remaining_self_loops(
+             edge_index, edge_weight, fill_value, num_nodes)
+         assert tmp_edge_weight is not None
+         edge_weight = tmp_edge_weight
+    row, col = edge_index[0], edge_index[1]
+    deg = scatter_add(edge_weight, col, dim=0, dim_size=num_nodes)
+    deg_inv_sqrt = deg.pow_(-0.5)
+    deg_inv_sqrt.masked_fill_(deg_inv_sqrt == float('inf'), 0)
+    #print('normalized adj val:', deg_inv_sqrt[row] * edge_weight * deg_inv_sqrt[col])
+    return edge_index, deg_inv_sqrt[row] * edge_weight * deg_inv_sqrt[col]
 
 def start_time(group, rank, subset=False, src=None):
     global barrier_time
@@ -487,6 +509,7 @@ class GCNFunc(torch.autograd.Function):
             # z = block_row(adj_matrix.t(), am_partitions, inputs, weight, rank, size)
             y1 = spmm_func( am_partitions, inputs, rank, size, group, row_group, col_group, ht)
             print('SpMM:',y1)
+            torch.save(y1, 'RDM_SPMM.pt')
             
             # Convert y1 to x1
             #if rank == 0:                print('intra_layer_v2h ',end='') 
@@ -501,6 +524,7 @@ class GCNFunc(torch.autograd.Function):
                     ctx.input_h = input_h
             z = gemm_func(x1, weight, rank, size, group, row_group, col_group, ht)
             print('GeMM:',z)
+            torch.save(z, 'RDM_GeMM.pt')
 
         print('$'*30)
         if last_layer and not ht:
@@ -514,7 +538,7 @@ class GCNFunc(torch.autograd.Function):
         #print('z '+str(z.size()))
         if activations:
             if func is F.log_softmax:
-                return z
+                #return z
                 if ht:
                     h = func(z, dim=1)
                 else:
@@ -619,26 +643,23 @@ def train(inputs, weight1, weight2, adj_matrix, am_partitions, optimizer, order,
     print(weight2)
     print('*'*30)
     print('adj:', adj_matrix)
-    #torch.save(adj_matrix, 'RDM_ADJ.pt')
+    #torch.save(adj_matrix, 'RDM_ADJ_Symmetric.pt')
     print('x:', inputs)
     print('*'*30)
     order1 = order[0] + order[3]
     outputs = GCNFunc.apply(inputs, weight1, adj_matrix, am_partitions, rank, size, group, row_groups, col_groups, order1, False, F.relu)
     print('layer0:',outputs.shape, outputs) 
     print('*'*30)
-    exit()
+    #exit()
     order2 = order[1] + order[2]
     outputs = GCNFunc.apply(outputs, weight2, adj_matrix, am_partitions, rank, size, group, row_groups, col_groups, order2, True, F.log_softmax)
-   
     print('layer1:',outputs.shape, outputs) 
-    exit()
-
+    #exit()
     optimizer.zero_grad()
     # print(data.train_mask.bool().size())
     # print(data.y.size())
     rank_train_mask = data.train_mask.bool()
     datay_rank = data.y
-    
     v_size = []
     for c in range(replication):
         v_size += dim_count[c][0]    
@@ -672,12 +693,18 @@ def train(inputs, weight1, weight2, adj_matrix, am_partitions, optimizer, order,
         print(dim_count)
         '''
         if ht:
-            loss = F.nll_loss(outputs[rank_train_mask], datay_rank[rank_train_mask].long())
+            print('ht')
+            loss = F.nll_loss(outputs[rank_train_mask], datay_rank[rank_train_mask].long(), reduction='mean')
         else:
+            print('vt')
             row_id = rank // (size//replication)
             loss = dist_nll(outputs[rank_train_mask], datay_rank[rank_train_mask].long(),row_groups[row_id])
         # loss = F.nll_loss(outputs, torch.max(datay_rank, 1)[1])
         
+#        print('loss:', loss.item())
+#        print('grad:', loss.grad)
+#        exit()
+
         loss.backward()
     else:
         print('fake loss')
@@ -840,17 +867,7 @@ def get_proc_groups(rank, size):
 
     return row_groups, col_groups
 
-def oned_partition(rank, size, inputs, adj_matrix, data, features, classes, device):
-    #global row_count
-    #global col_count
-    '''
-    This function will divide sparse matrix into replication
-    row panels. Each row panel then will be divided into 
-    replication parts so we can do an easier SpMM without merging
-    dense matrices. So we are going to reuse CAGNET 1D code here
-    only replacing size with replication and changing the initial division
-    dimension from vertival to horizontal.
-    '''
+def oned_partition(rank, size, inputs, adj_matrix, data, features, classes, device, edge_w=None):
     global dim_count
     global ht
     global replication
@@ -879,13 +896,22 @@ def oned_partition(rank, size, inputs, adj_matrix, data, features, classes, devi
         am_pbyp, col_indices = split_coo(am_partitions[row_id], node_count, c_per_proc, 1)
         
         for i in range(replication):
-            c_node_count = col_indices[i + 1] - col_indices[i]
-            am_pbyp[i] = torch.sparse_coo_tensor(am_pbyp[i], torch.ones(am_pbyp[i].size(1)), 
-                                                    size=(r_node_count,c_node_count),
-                                                    requires_grad=False)
+            size_p = am_pbyp[i].size(1)
+            if edge_w is not None:
+                edge_w_part = torch.split(edge_w, size_p)
 
-            am_pbyp[i] = scale_elements(adj_matrix, am_pbyp[i], node_count, vtx_indices[row_id], 
-                                                col_indices[i])
+            c_node_count = col_indices[i + 1] - col_indices[i]
+            if edge_w is not None:
+                am_pbyp[i] = torch.sparse_coo_tensor(am_pbyp[i], edge_w_part[i], 
+                                                        size=(r_node_count,c_node_count),
+                                                        requires_grad=False)
+            else:
+                am_pbyp[i] = torch.sparse_coo_tensor(am_pbyp[i], torch.ones(am_pbyp[i].size(1)), 
+                                                        size=(r_node_count,c_node_count),
+                                                        requires_grad=False)
+
+                am_pbyp[i] = scale_elements(adj_matrix, am_pbyp[i], node_count, vtx_indices[row_id], 
+                                                    col_indices[i])
             
                 
         proc_node_count = vtx_indices[row_id + 1] - vtx_indices[row_id]
@@ -893,7 +919,8 @@ def oned_partition(rank, size, inputs, adj_matrix, data, features, classes, devi
                                                 torch.ones(am_partitions[row_id].size(1)), 
                                                 size=(proc_node_count, node_count), 
                                                 requires_grad=False)
-        am_partitions[row_id] = scale_elements(adj_matrix, am_partitions[row_id], node_count,  vtx_indices[row_id], 0, rank=rank,save=True)
+        if edge_w is None:
+            am_partitions[row_id] = scale_elements(adj_matrix, am_partitions[row_id], node_count,  vtx_indices[row_id], 0, rank=rank,save=True)
         
         # First split inputs into multiple row panels
         inputs_row = torch.split(inputs, math.ceil(float(inputs.size(0)) / replication), dim=0)
@@ -1032,9 +1059,10 @@ def run(rank, size, inputs, adj_matrix, data, features, classes, device):
     # inputs_loc = torch.rand(n_per_proc, inputs.size(1))
 
     # adj_matrix = symmetric(adj_matrix)
-   
+  
+    edge_w = data.edge_weight if not normalization else None
     inputs_loc, adj_matrix_loc, am_pbyp, horizontal_tiled = oned_partition(rank, size, inputs, adj_matrix, data, 
-                                                                features, classes, device)
+                                                                features, classes, device, edge_w=edge_w)
 
     
     inputs_loc = inputs_loc.to(device)
@@ -1048,12 +1076,12 @@ def run(rank, size, inputs, adj_matrix, data, features, classes, device):
         random.seed(0)
         np.random.seed(0)
         # TODO use 1 for weights and feats: result should be sum(nnz_per_row)
-        weight1_nonleaf = torch.ones(features, mid_layer, requires_grad=True)
+        weight1_nonleaf = torch.rand(features, mid_layer, requires_grad=True)
         torch.save(weight1_nonleaf, 'w1.pt')
         weight1_nonleaf = weight1_nonleaf.to(device)
         weight1_nonleaf.retain_grad()
 
-        weight2_nonleaf = torch.ones(mid_layer, classes, requires_grad=True)
+        weight2_nonleaf = torch.rand(mid_layer, classes, requires_grad=True)
         torch.save(weight2_nonleaf, 'w2.pt')
         weight2_nonleaf = weight2_nonleaf.to(device)
         weight2_nonleaf.retain_grad()
@@ -1076,7 +1104,7 @@ def run(rank, size, inputs, adj_matrix, data, features, classes, device):
         print(weight2)
         #exit()
 
-        optimizer = torch.optim.Adam([weight1, weight2], lr=0.01)
+        optimizer = torch.optim.Adam([weight1, weight2], lr=0.001)
         dist.barrier(group)
 
         tstart = 0.0
@@ -1133,7 +1161,7 @@ def run(rank, size, inputs, adj_matrix, data, features, classes, device):
         # for epoch in range(1, 201):
         print(f"\nStarting training... rank {rank} run {i}", flush=True)
         elapsed_time = 0
-        for epoch in range(1, epochs):            
+        for epoch in range(50):            
             if len(order_time) < len(candidate_order):
                 mmorder_c = candidate_order[len(order_time)]
             elif best_mmorder == -1:
@@ -1181,7 +1209,7 @@ def run(rank, size, inputs, adj_matrix, data, features, classes, device):
                     print(log)
                     with open(args.acc_csv, 'a') as f:
                         ws = os.environ['WORLD_SIZE']
-                        log = f'{graphname},RDM,{ws},{epoch:03d},{elapsed_time:.4f},{test_acc:.4f}\n'
+                        log = f'{graphname},RDM,{ws},{epoch:03d},{elapsed_time:.4f},{tmp_test_acc:.4f}\n'
                         f.write(log) 
 
 
@@ -1393,7 +1421,11 @@ def main():
         data = data.to(device)
         inputs.requires_grad = True
         data.y = data.y.to(device)
-    elif graphname in ['meta', 'arctic25', 'oral']:
+    elif graphname in ['meta', 'arctic25', 'oral', 'arxiv', 'reddit', 'products']:
+        if graphname == 'arxiv':
+            graphname = 'ogbn-arxiv'
+        if graphname == 'products':
+            graphname = 'ogbn-products'
         pref = '/scratch/general/nfs1/u1320844/dataset/asplos/{}_subgs/'.format(graphname)
         adj_full = torch.load(pref+'adj_full.pt')
         x_full = torch.load(pref+'x_full.pt')
@@ -1413,17 +1445,37 @@ def main():
         data.val_mask = val_mask_full
         data.test_mask = test_mask_full
         # use 1 for node feats
-        data.x = torch.ones(data.x.shape)
+        #data.x = torch.ones(data.x.shape)
         inputs = data.x.to(device)
         data.y = data.y.to(device)
         edge_index = data.edge_index
+        num_nodes = len(data.x)
+        #if not normalization:
+        _, data.edge_weight = gcn_norm(data.edge_index, num_nodes=num_nodes)
+        #else:
+        #    data.edge_weight=None
+        #edge_index = to_undirected(edge_index)
         #edge_index = symmetric(edge_index)
-        #edge_index, _ = add_remaining_self_loops(edge_index) 
+        deg = degree(edge_index[0])
+        print((deg==1).nonzero().shape)
+        print(deg.max())
+        print(len(edge_index[0]))
+        #exit()
+        # TODO only symmetrify arxiv prod
+        #edge_index = symmetric(edge_index)
+        edge_index, _ = add_remaining_self_loops(edge_index) 
+        print(edge_index.shape)
+        print(edge_index)
+        torch.save(edge_index, 'RDM_ADJ_SYM.pt')
+        #exit()
         num_features = x_full.shape[-1]
         tmp = {}
         tmp['meta'] = 25
         tmp['oral'] = 32 
+        tmp['reddit'] = 41
         tmp['arctic25'] = 33
+        tmp['ogbn-arxiv'] = 40
+        tmp['ogbn-products'] = 47
         num_classes = tmp[graphname]
     elif 'ogb' in graphname:
         path = '/scratch/general/nfs1/u1320844/dataset'
@@ -1456,8 +1508,8 @@ def main():
         data.y = data.y.squeeze().to(device)
         edge_index = data.edge_index
         print('making symmetric')
-#        edge_index = symmetric(edge_index)
-        edge_index, _ = add_remaining_self_loops(edge_index) 
+        edge_index = symmetric(edge_index)
+#        edge_index, _ = add_remaining_self_loops(edge_index) 
         print('adj:', edge_index.shape)
         num_features = dataset.num_features if not 'mag' in graphname else 128
         num_classes = dataset.num_classes

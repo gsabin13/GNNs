@@ -1,0 +1,16 @@
+import torch
+#dgl_spmm = torch.load('DGL_SPMM.pt')
+#rdm_spmm = torch.load('RDM_SPMM.pt')
+#dgl_gemm = torch.load('DGL_GeMM.pt')
+#rdm_gemm = torch.load('RDM_GeMM.pt')
+#feat = torch.ones((len(dgl_spmm)),))
+dgl_adj = torch.load('dgl_added_self_loop.pt')
+rdm_adj = torch.load('RDM_ADJ.pt')
+rdm_sym_adj = torch.load('RDM_ADJ_Symmetric.pt')
+
+print(dgl_adj.coalesce().indices().shape)
+print(rdm_adj.coalesce().indices().shape)
+print(rdm_sym_adj.coalesce().indices().shape)
+print(dgl_adj.coalesce().indices())
+print(rdm_adj.coalesce().indices())
+print(rdm_sym_adj.coalesce().indices())

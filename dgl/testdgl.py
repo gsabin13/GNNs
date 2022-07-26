@@ -46,15 +46,17 @@ class GCN(nn.Module):
         #random.seed(0)
         #np.random.seed(0)
         # input layer
-        self.layers.append(GraphConv(in_feats, n_hidden, activation=activation,norm='none',bias=False))
+        self.layers.append(GraphConv(in_feats, n_hidden, activation=activation,norm='both',bias=False))
+#        self.layers.append(GraphConv(in_feats, n_hidden, activation=activation,norm='none',bias=False))
         # hidden layers
         for i in range(n_layers - 1):
-            self.layers.append(GraphConv(n_hidden, n_hidden, activation=activation,norm='none',bias=False))
+            self.layers.append(GraphConv(n_hidden, n_hidden, activation=activation,norm='both',bias=False))
         # output layer
-        self.layers.append(GraphConv(n_hidden, n_classes,norm='none',bias=False))
+        self.layers.append(GraphConv(n_hidden, n_classes,norm='both',bias=False))
+        #self.layers.append(GraphConv(n_hidden, n_classes,norm='none',bias=False))
         self.dropout = nn.Dropout(p=dropout)
-        #w1 = torch.nn.Parameter(torch.rand(self.layers[0].weight.shape), requires_grad=True)
-        #w2 = torch.nn.Parameter(torch.rand(self.layers[1].weight.shape), requires_grad=True)
+        #w1 = torch.nn.Parameter(torch.ones(self.layers[0].weight.shape), requires_grad=True)
+        #w2 = torch.nn.Parameter(torch.ones(self.layers[1].weight.shape), requires_grad=True)
         w1 = torch.nn.Parameter(torch.load('w1.pt'), requires_grad=True)
         w2 = torch.nn.Parameter(torch.load('w2.pt'), requires_grad=True)
         print(w1.shape)
@@ -71,14 +73,14 @@ class GCN(nn.Module):
         h = g.ndata['feat']
         print(g)
         print('adj:',g.adj())
-        #torch.save(g.adj(), 'DGL_ADJ.pt')
+        torch.save(g.adj(), 'DGL_ADJ.pt')
         print('x:',h)
         for i, layer in enumerate(self.layers):
             h = layer(g, h)
             print(f'layer{i}W:', layer.weight)
             print(f'layer{i}:', h.shape, h)
             print('#'*30)
-        exit()
+        #exit()
         return h
 
 
@@ -96,17 +98,36 @@ def main(args):
     pref_reddit = '../../reddit_subgs/'.format(args.dataset)
     pref = '/scratch/general/nfs1/u1320844/dataset/asplos/{}_subgs/'.format(args.dataset)
     subgraphs = []
-    adj_full = torch.load(pref+'adj_full.pt')
+    #adj_full = torch.load(pref+'adj_full.pt')
+    adj_full = torch.load('RDM_ADJ_SYM.pt')
     x_ = torch.load(pref+'x_full.pt')
     y_ = torch.load(pref+'y_full.pt')
     trm_ = torch.load(pref+'train_mask_full.pt')
     tem_ = torch.load(pref+'test_mask_full.pt')
-    g = dgl.graph((adj_full[0], adj_full[1]))
-#    g = dgl.add_self_loop(g)
-    if args.dataset == 'ogbn-arxiv':
-        g = dgl.to_bidirected(g)
-    #g.ndata['feat'] = x_
-    g.ndata['feat'] = torch.ones(x_.shape)
+    #in_ = adj_full.coalesce().indices()[0]
+    #out_ = adj_full.coalesce().indices()[1]
+    in_ = adj_full[0]
+    out_ = adj_full[1]
+    #g = dgl.graph((in_, out_))
+    g = dgl.graph((out_, in_))
+    #print(g)
+    #g = dgl.to_bidirected(g)
+    #print(g)
+    #g = dgl.add_self_loop(g)
+    print(g)
+    #exit()
+    in_degrees = g.in_degrees()
+    out_degrees = g.out_degrees()
+    #torch.save(g.adj(), 'dgl_added_self_loop.pt')
+    #print((degrees==1).nonzero().shape)
+    print(in_degrees)
+    print(out_degrees)
+    print(max(in_degrees))
+    print(max(out_degrees))
+    print(in_degrees==out_degrees)
+    #if args.dataset == 'ogbn-arxiv':
+    g.ndata['feat'] = x_
+    #g.ndata['feat'] = torch.ones(x_.shape)
     g.ndata['label'] = y_
     print('Max label:', torch.max(y_))
     g.ndata['train_mask'] = trm_
@@ -170,33 +191,36 @@ def main(args):
     dur = []
     g = g.to(device)
     trm = trm_.to(device)
-    for epoch in range(2000):
+    for epoch in range(50):
         ep_start = time.time()
         model.train()
         # forward
         pred = model(g)
-        print(pred)
-        exit()
+       # print(pred)
+        #exit()
+        optimizer.zero_grad()
         batch_labels = g.ndata['label']
         loss = F.cross_entropy(pred[trm], batch_labels[trm].long(), reduction='mean')
-        optimizer.zero_grad()
+        #print('loss:', loss.item())
+        #print('grad:', loss.grad)
+        #exit()
         loss.backward()
-        torch.nn.utils.clip_grad_norm(model.parameters(), 5)
+        #torch.nn.utils.clip_grad_norm(model.parameters(), 5)
         optimizer.step()
         dur.append(time.time()-ep_start)
         torch.cuda.empty_cache()
-        if rk == 0:# and j == len(loader) - 1 and epoch%10==0:
-            model.eval()
-            with torch.no_grad():
-                #train_f1_mic, train_f1_mac = calc_f1(batch_labels.cpu().numpy(),
-                #                                     pred.cpu().numpy(), False)
-                train_f1_mic = eval(batch_labels[trm].cpu().numpy(),
-                                                     pred[trm].cpu().numpy(), False)
-                print(f"epoch:{epoch + 1}/{args.n_epochs}, training loss:{loss.item()}")
-                print("Train Acc {:.4f}".format(train_f1_mic))
+        #if rk == 0:# and j == len(loader) - 1 and epoch%10==0:
+        #    model.eval()
+        #    with torch.no_grad():
+        #        #train_f1_mic, train_f1_mac = calc_f1(batch_labels.cpu().numpy(),
+        #        #                                     pred.cpu().numpy(), False)
+        #        train_f1_mic = eval(batch_labels[trm].cpu().numpy(),
+        #                                             pred[trm].cpu().numpy(), False)
+        #        print(f"epoch:{epoch + 1}/{args.n_epochs}, training loss:{loss.item()}")
+        #        print("Train Acc {:.4f}".format(train_f1_mic))
         # evaluate
-        model.eval()
         if epoch % 1 == 0 and rk == 0:
+            model.eval()
             if cpu_flag and cuda:  # Only when we have shifted model to gpu and we need to shift it back on cpu
                 model = model.to('cpu')
             #val_f1_mic, val_f1_mac = evaluate(
@@ -229,9 +253,9 @@ def main(args):
     #        log_dir, 'best_model_{}.pkl'.format(task))))
     if cpu_flag and cuda:
         model = model.to('cpu')
-    test_f1_mic, test_f1_mac = evaluate(
-        model, g, g.ndata['label'], test_mask, False)
-    print("Test F1-mic {:.4f}, Test F1-mac {:.4f}".format(test_f1_mic, test_f1_mac))
+    #test_f1_mic, test_f1_mac = evaluate(
+    #    model, g, g.ndata['label'], test_mask, False)
+    #print("Test F1-mic {:.4f}, Test F1-mac {:.4f}".format(test_f1_mic, test_f1_mac))
 
 if __name__ == '__main__':
     warnings.filterwarnings('ignore')
