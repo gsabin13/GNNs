@@ -31,6 +31,23 @@ def setup(rank, world_size):
 def cleanup():
     dist.destroy_process_group()
 
+from torch_geometric.utils import remove_self_loops, add_remaining_self_loops, to_dense_adj, dense_to_sparse, to_scipy_sparse_matrix
+def symmetric(adj_matrix):
+    # print(adj_matrix)
+    # not sure whether the following is needed
+    adj_matrix = adj_matrix.to(torch.device("cpu"))
+    adj_matrix, _ = remove_self_loops(adj_matrix)
+    # Make adj_matrix symmetrical
+    idx = torch.LongTensor([1,0])
+    adj_matrix_transpose = adj_matrix.index_select(0,idx)
+    # print(adj_matrix_transpose)
+    adj_matrix = torch.cat([adj_matrix,adj_matrix_transpose],1)
+    adj_matrix, _ = add_remaining_self_loops(adj_matrix)
+    return adj_matrix
+
+
+
+
 class GCN(nn.Module):
     def __init__(self,
                  in_feats,
@@ -42,13 +59,18 @@ class GCN(nn.Module):
         super(GCN, self).__init__()
         self.layers = nn.ModuleList()
         # input layer
-        self.layers.append(GraphConv(in_feats, n_hidden, activation=activation))
+        self.layers.append(GraphConv(in_feats, n_hidden, activation=activation, norm='both', bias=False))
         # hidden layers
         for i in range(n_layers - 1):
-            self.layers.append(GraphConv(n_hidden, n_hidden, activation=activation))
+            self.layers.append(GraphConv(n_hidden, n_hidden, activation=activation, norm='both', bias=False))
         # output layer
-        self.layers.append(GraphConv(n_hidden, n_classes))
+        self.layers.append(GraphConv(n_hidden, n_classes, norm='both', bias=False))
         self.dropout = nn.Dropout(p=dropout)
+        if args.load:
+            w1 = torch.nn.Parameter(torch.load('gs_w1.pt'), requires_grad=True)
+            w2 = torch.nn.Parameter(torch.load('gs_w2.pt'), requires_grad=True)
+            self.layers[0].weight = w1
+            self.layers[1].weight = w2
 
     def forward(self, g):
         h = g.ndata['feat']
@@ -78,20 +100,31 @@ def main(args):
         cpu_flag = False
 
     # Load data
-    pref_reddit = '../../reddit_subgs/'.format(args.dataset)
+    #pref_reddit = '../../reddit_subgs/'.format(args.dataset)
     pref = '/scratch/general/nfs1/u1320844/dataset/asplos/{}_subgs/'.format(args.dataset)
     # Load subg data
     subgraphs = []
-    if args.dataset == 'reddit':
-        pref_tmp = pref
-        pref = pref_reddit
+    #if args.dataset == 'reddit':
+    #    pref_tmp = pref
+    #    pref = pref_reddit
     for i in range(32):
+        # TODO use upper/lower/symmetric
         adj_ = torch.load(pref+'adj_{}.pt'.format(i))
         x_ = torch.load(pref+'x_{}.pt'.format(i))
         y_ = torch.load(pref+'y_{}.pt'.format(i))
         tm_ = torch.load(pref+'train_mask_{}.pt'.format(i))
-        g = dgl.graph((adj_[0], adj_[1]))
-        g = dgl.add_self_loop(g)
+        if args.topo == 'lower':
+            g = dgl.graph((adj_[1], adj_[0]))
+            g = dgl.add_self_loop(g)
+        elif args.topo == 'upper':
+            g = dgl.graph((adj_[0], adj_[1]))
+            g = dgl.add_self_loop(g)
+        elif args.topo == 'sym':
+            adj_sym = symmetric(adj_)
+            g = dgl.graph((adj_sym[0], adj_sym[1]))
+        # if by default add self loop
+        #if args.self_loop:
+        #    g = dgl.add_self_loop(g)
         if not g.num_nodes() == len(x_):
             print(g.num_nodes())
             print(x_.shape)
@@ -107,8 +140,8 @@ def main(args):
         subgraphs.append(g)
 
     # load full graph
-    if args.dataset == 'reddit':
-        pref = pref_tmp
+    #if args.dataset == 'reddit':
+    #    pref = pref_tmp
     adj_full = torch.load(pref+'adj_full.pt')
     x_ = torch.load(pref+'x_full.pt')
     y_ = torch.load(pref+'y_full.pt')
@@ -116,7 +149,7 @@ def main(args):
     vam_ = torch.load(pref+'val_mask_full.pt')
     tem_ = torch.load(pref+'test_mask_full.pt')
     g = dgl.graph((adj_full[0], adj_full[1]))
-    g = dgl.add_self_loop(g)
+    #g = dgl.add_self_loop(g)
     if args.dataset == 'ogbn-arxiv':
         g = dgl.to_bidirected(g)
     g.ndata['feat'] = x_
@@ -165,24 +198,6 @@ def main(args):
            n_val_samples,
            n_test_samples))
     # load sampler
-
-#    kwargs = {
-#        'dn': args.dataset, 'g': g, 'train_nid': train_nid, 'num_workers_sampler': args.num_workers_sampler,
-#        'num_subg_sampler': args.num_subg_sampler, 'batch_size_sampler': args.batch_size_sampler,
-#        'online': args.online, 'num_subg': args.num_subg, 'full': args.full
-#    }
-#
-#    if args.sampler == "node":
-#        saint_sampler = SAINTNodeSampler(args.node_budget, **kwargs)
-#    elif args.sampler == "edge":
-#        saint_sampler = SAINTEdgeSampler(args.edge_budget, **kwargs)
-#    elif args.sampler == "rw":
-#        saint_sampler = SAINTRandomWalkSampler(args.num_roots, args.length, **kwargs)
-#    else:
-#        raise NotImplementedError
-#    loader = DataLoader(saint_sampler, collate_fn=saint_sampler.__collate_fn__, batch_size=1,
-#                        shuffle=True, num_workers=args.num_workers, drop_last=False)
-# TODO
     loader = subgraphs
     chunk_size = len(loader)//ws
     if rk == ws-1:
@@ -222,6 +237,10 @@ def main(args):
 #    )
     model = GCN(in_feats=in_feats, n_hidden=args.n_hidden, n_classes=n_classes, n_layers=1,activation=nn.functional.relu, dropout=0.1)
     print(model)
+    if args.save:
+        torch.save(model.layers[0].weight, f'dgl_gs_{args.dataset}_w1.pt')
+        torch.save(model.layers[1].weight, f'dgl_gs_{args.dataset}_w2.pt')
+        exit()
     #model = DDP(model, )
     # TODO mv model to rank
     model = model.to(device_id)
@@ -245,7 +264,7 @@ def main(args):
     best_f1 = -1
 
     dur = []
-    for epoch in range(1000):
+    for epoch in range(500):
         ep_start = time.time()
         for j, subg in tqdm(enumerate(loader)):
             subg = subg.to(device)
@@ -268,7 +287,7 @@ def main(args):
             #print('loss:', loss.item())
             #exit()
             loss.backward()
-            torch.nn.utils.clip_grad_norm(model.parameters(), 5)
+            #torch.nn.utils.clip_grad_norm(model.parameters(), 5)
             optimizer.step()
             dur.append(time.time()-ep_start)
             torch.cuda.empty_cache()
@@ -282,7 +301,18 @@ def main(args):
                     print("Train F1-mic {:.4f}, Train F1-mac {:.4f}".format(train_f1_mic, train_f1_mac))
         # evaluate
         model.eval()
-        if epoch % 10 == 0 and rk == 0:
+        eval_freq = 1
+        if epoch < 10:
+            eval_freq = 1
+        elif epoch <20:
+            eval_freq = 2
+        elif epoch <100:
+            eval_freq = 5
+        else:
+            eval_freq = 10 
+
+
+        if epoch % eval_freq == 0 and rk == 0:
             if cpu_flag and cuda:  # Only when we have shifted model to gpu and we need to shift it back on cpu
                 model = model.to('cpu')
             #val_f1_mic, val_f1_mac = evaluate(
@@ -296,7 +326,7 @@ def main(args):
                 print('new best val f1:', best_f1)
                 #torch.save(model.state_dict(), os.path.join(
                 #    log_dir, 'best_model_{}.pkl'.format(task)))
-            logline = f'{args.dataset},dgl,{ws},{epoch},{np.sum(dur):.4f},{val_f1_mic:.4f}\n'
+            logline = f'{args.dataset},dgl,{ws},{args.topo},{epoch},{np.sum(dur):.4f},{val_f1_mic:.4f}\n'
             print(logline)
             if rk == 0:
                 with open(args.csv,'a') as f :
@@ -323,12 +353,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='GraphSAINT')
     parser.add_argument("--dataset", type=str, default="ppi_n", help="type of tasks")
     parser.add_argument("--online", dest='online', action='store_true', help="sampling method in training phase")
+    parser.add_argument("--self_loop",  action='store_true')
+    parser.add_argument("--load",  action='store_true')
+    parser.add_argument("--save",  action='store_true')
     parser.add_argument("--n_hidden", type=int, default=128)
     parser.add_argument("--n_epochs", type=int, default=50, help="the gpu index")
     parser.add_argument("--gpu", type=int, default=0, help="the gpu index")
     parser.add_argument("--lr", type=float, default=0.001, help="the gpu index")
     parser.add_argument("--csv", type=str, default='test.csv')
     parser.add_argument("--log_dir", type=str, default='test')
+    parser.add_argument("--topo", type=str, default='upper')
     args = parser.parse_args()
     #task = parser.parse_args().task
     #args = argparse.Namespace(**CONFIG[task])

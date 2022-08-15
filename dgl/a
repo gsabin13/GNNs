@@ -1,4 +1,0 @@
-Dataset,#GPU,Epoch time,Method
-a,1,1,CAGNET
-a,1,1,DGCL
-a,1,1,RDM

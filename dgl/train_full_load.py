@@ -221,6 +221,9 @@ def main(args):
 #    )
     model = GCN(in_feats=in_feats, n_hidden=args.n_hidden, n_classes=n_classes, n_layers=1,activation=nn.functional.relu, dropout=0.1)
     print(model)
+    torch.save(model.layers[0].weight, 'w1.pt')
+    torch.save(model.layers[1].weight, 'w2.pt')
+    #exit()
     #model = DDP(model, )
     # TODO mv model to rank
     model = model.to(device_id)
@@ -247,7 +250,7 @@ def main(args):
     g = g.to(device)
     #g.ndata['train_mask'] = trm_
     trm = trm_.to(device)
-    for epoch in range(2000):
+    for epoch in range(args.n_epochs):
         ep_start = time.time()
         model.train()
         # forward

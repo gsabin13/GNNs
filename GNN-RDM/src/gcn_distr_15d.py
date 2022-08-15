@@ -670,7 +670,7 @@ def run(rank, size, inputs, adj_matrix, data, features, classes, device):
                     output_parts.append(torch.cuda.FloatTensor(n_per_proc, classes, device=device).fill_(0))
 
                 if outputs.size(0) != n_per_proc:
-                    pad_row = n_per_proc - outputs.size(0) 
+                    pad_row = n_per_proc - outputs.size(0)
                     outputs = torch.cat((outputs, torch.cuda.FloatTensor(pad_row, classes, device=device)), dim=0)
 
                 # dist.all_gather(output_parts, outputs)
@@ -689,7 +689,7 @@ def run(rank, size, inputs, adj_matrix, data, features, classes, device):
                     test_acc = tmp_test_acc
                 #log = 'Epoch: {:03d}, Train: {:.4f}, Val: {:.4f}, Test: {:.4f}'
                 ws = os.environ['WORLD_SIZE']
-                logline = f'{graphname},CAGNET-1.5D,{ws},{epoch},{cumulative_time:.4f},{tmp_test_acc:.4f}\n'
+                logline = f'{graphname},CAGNET-1.5D-r{replication},{ws},{epoch},{cumulative_time:.4f},{tmp_test_acc:.4f}\n'
                 if rank == 0 and len(args.acc_csv)>2:
                     print(logline)
                     if not osp.exists(args.acc_csv):
@@ -899,9 +899,9 @@ def main():
         num_features = x_full.shape[-1]
         tmp = {}
         tmp['meta'] = 25
-        tmp['oral'] = 32 
+        tmp['oral'] = 32
         tmp['arctic25'] = 33
-        num_classes = tmp[graphname] 
+        num_classes = tmp[graphname]
 
     elif graphname == "Reddit":
         #path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data', graphname)

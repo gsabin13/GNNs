@@ -5,3 +5,5 @@
 fig11_2
 log/
 *.out
+dgl/log/
+dgl/__pycache__/

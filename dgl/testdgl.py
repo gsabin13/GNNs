@@ -46,34 +46,46 @@ class GCN(nn.Module):
         #random.seed(0)
         #np.random.seed(0)
         # input layer
-        self.layers.append(GraphConv(in_feats, n_hidden, activation=activation,norm='both',bias=False))
-#        self.layers.append(GraphConv(in_feats, n_hidden, activation=activation,norm='none',bias=False))
+        if args.nonorm:
+            self.layers.append(GraphConv(in_feats, n_hidden, activation=activation,norm='none',bias=False))
+        else:
+            self.layers.append(GraphConv(in_feats, n_hidden, activation=activation,norm='both',bias=False))
         # hidden layers
-        for i in range(n_layers - 1):
-            self.layers.append(GraphConv(n_hidden, n_hidden, activation=activation,norm='both',bias=False))
+        #for i in range(n_layers - 1):
+        #    self.layers.append(GraphConv(n_hidden, n_hidden, activation=activation,norm='both',bias=False))
         # output layer
-        self.layers.append(GraphConv(n_hidden, n_classes,norm='both',bias=False))
-        #self.layers.append(GraphConv(n_hidden, n_classes,norm='none',bias=False))
+        if args.nonorm:
+            self.layers.append(GraphConv(n_hidden, n_classes,norm='none',bias=False))
+        else:
+            self.layers.append(GraphConv(n_hidden, n_classes,norm='both',bias=False))
+
         self.dropout = nn.Dropout(p=dropout)
-        #w1 = torch.nn.Parameter(torch.ones(self.layers[0].weight.shape), requires_grad=True)
-        #w2 = torch.nn.Parameter(torch.ones(self.layers[1].weight.shape), requires_grad=True)
-        w1 = torch.nn.Parameter(torch.load('w1.pt'), requires_grad=True)
-        w2 = torch.nn.Parameter(torch.load('w2.pt'), requires_grad=True)
-        print(w1.shape)
-        print(w1)
-        print(w2.shape)
-        print(w2)
-        self.layers[0].weight = w1
-        self.layers[1].weight = w2
+
+        if args.load:
+            g = args.dataset.replace('ogbn-','')
+            w1 = torch.nn.Parameter(torch.load('rdm_{}_w1.pt'.format(g)), requires_grad=True)
+            w2 = torch.nn.Parameter(torch.load('rdm_{}_w2.pt'.format(g)), requires_grad=True)
+            print(w1.shape)
+            print(w1)
+            print(w2.shape)
+            print(w2)
+            # w1 = torch.nn.Parameter(torch.ones(self.layers[0].weight.shape), requires_grad=True)
+            # w2 = torch.nn.Parameter(torch.ones(self.layers[1].weight.shape), requires_grad=True)
+            self.layers[0].weight = w1
+            self.layers[1].weight = w2
+        else:
+            g = args.dataset.replace('ogbn-','')
+            torch.save(self.layers[0].weight, 'dgl_{}_w1.pt'.format(g))
+            torch.save(self.layers[1].weight, 'dgl_{}_w2.pt'.format(g))
         for l in self.layers:
             print(l.weight)
         print('*'*50)
 
     def forward(self, g):
         h = g.ndata['feat']
-        print(g)
-        print('adj:',g.adj())
-        torch.save(g.adj(), 'DGL_ADJ.pt')
+        #print(g)
+        #print('adj:',g.adj())
+        #torch.save(g.adj(), 'DGL_ADJ.pt')
         print('x:',h)
         for i, layer in enumerate(self.layers):
             h = layer(g, h)
@@ -95,31 +107,39 @@ def main(args):
         cpu_flag = False 
     else:
         cpu_flag = False
-    pref_reddit = '../../reddit_subgs/'.format(args.dataset)
-    pref = '/scratch/general/nfs1/u1320844/dataset/asplos/{}_subgs/'.format(args.dataset)
-    subgraphs = []
-    #adj_full = torch.load(pref+'adj_full.pt')
-    adj_full = torch.load('RDM_ADJ_SYM.pt')
-    x_ = torch.load(pref+'x_full.pt')
-    y_ = torch.load(pref+'y_full.pt')
-    trm_ = torch.load(pref+'train_mask_full.pt')
-    tem_ = torch.load(pref+'test_mask_full.pt')
-    #in_ = adj_full.coalesce().indices()[0]
-    #out_ = adj_full.coalesce().indices()[1]
+    if args.dataset == 'toy':
+        adj_full = torch.tensor([[1,2,3,4,5],[0,1,2,3,4]]).long()
+        x_ = torch.ones(6,1)
+        y_ = torch.ones(6).long()
+        trm_ = torch.ones(6).bool()
+        tem_ = torch.ones(6).bool()   
+    else:
+        pref = '/scratch/general/nfs1/u1320844/dataset/asplos/{}_subgs/'.format(args.dataset)
+        if args.topo=='sym':
+            print('loading rdm saved adj')
+            adj_full = torch.load(pref+'adj_full_sym.pt')
+        else:
+            adj_full = torch.load(pref+'adj_full.pt')
+        x_ = torch.load(pref+'x_full.pt')
+        y_ = torch.load(pref+'y_full.pt')
+        trm_ = torch.load(pref+'train_mask_full.pt')
+        tem_ = torch.load(pref+'test_mask_full.pt')
     in_ = adj_full[0]
     out_ = adj_full[1]
-    #g = dgl.graph((in_, out_))
-    g = dgl.graph((out_, in_))
-    #print(g)
+    if args.topo == 'upper':
+        g = dgl.graph((in_, out_))
+    elif args.topo == 'lower':
+        g = dgl.graph((out_, in_))
+    else: # symmetric
+        g = dgl.graph((in_, out_))
     #g = dgl.to_bidirected(g)
-    #print(g)
-    #g = dgl.add_self_loop(g)
-    print(g)
+    if args.self_loop:
+        g = dgl.add_self_loop(g)
+    print(g.adj())
     #exit()
     in_degrees = g.in_degrees()
     out_degrees = g.out_degrees()
     #torch.save(g.adj(), 'dgl_added_self_loop.pt')
-    #print((degrees==1).nonzero().shape)
     print(in_degrees)
     print(out_degrees)
     print(max(in_degrees))
@@ -127,7 +147,7 @@ def main(args):
     print(in_degrees==out_degrees)
     #if args.dataset == 'ogbn-arxiv':
     g.ndata['feat'] = x_
-    #g.ndata['feat'] = torch.ones(x_.shape)
+    # g.ndata['feat'] = torch.ones(x_.shape)
     g.ndata['label'] = y_
     print('Max label:', torch.max(y_))
     g.ndata['train_mask'] = trm_
@@ -140,11 +160,12 @@ def main(args):
     nclassdict['meta'] = 25 
     nclassdict['arctic25'] = 33
     nclassdict['oral'] = 32 
+    nclassdict['toy'] = 2
     n_classes = nclassdict[args.dataset]#int(torch.max(g.ndata['label']))
     n_nodes = g.num_nodes()
     n_edges = g.num_edges()
     n_train_samples = trm_.int().sum().item()
-    n_val_samples = 0#vam_.int().sum().item()
+    n_val_samples = 0
     n_test_samples = tem_.int().sum().item()
 
     print("""----Data statistics------'
@@ -172,6 +193,7 @@ def main(args):
 
     model = GCN(in_feats=in_feats, n_hidden=args.n_hidden, n_classes=n_classes, n_layers=1,activation=nn.functional.relu, dropout=0.1)
     print(model)
+    #exit()
     # TODO mv model to rank
     model = model.to(device_id)
     model = DDP(model, device_ids=[device_id])
@@ -191,24 +213,32 @@ def main(args):
     dur = []
     g = g.to(device)
     trm = trm_.to(device)
-    for epoch in range(50):
+    for epoch in range(200):
         ep_start = time.time()
         model.train()
+        if args.dump:
+            torch.save(model.module.layers[0].weight, 'dgl_dumped_w1.pt')
+            torch.save(model.module.layers[1].weight, 'dgl_dumped_w2.pt')
+            #exit()
         # forward
         pred = model(g)
-       # print(pred)
+        print(pred)
+        torch.save(pred, 'dgl_output.pt')
         #exit()
-        optimizer.zero_grad()
         batch_labels = g.ndata['label']
         loss = F.cross_entropy(pred[trm], batch_labels[trm].long(), reduction='mean')
         #print('loss:', loss.item())
         #print('grad:', loss.grad)
         #exit()
+        optimizer.zero_grad()
         loss.backward()
-        #torch.nn.utils.clip_grad_norm(model.parameters(), 5)
+#        torch.nn.utils.clip_grad_norm(model.parameters(), 5)
         optimizer.step()
         dur.append(time.time()-ep_start)
         torch.cuda.empty_cache()
+        #if epoch >=1:
+        #    exit()
+        
         #if rk == 0:# and j == len(loader) - 1 and epoch%10==0:
         #    model.eval()
         #    with torch.no_grad():
@@ -235,7 +265,8 @@ def main(args):
                 print('new best val f1:', best_f1)
                 #torch.save(model.state_dict(), os.path.join(
                 #    log_dir, 'best_model_{}.pkl'.format(task)))
-            logline = f'{args.dataset},dgl,{ws},{epoch},{np.sum(dur):.4f},{val_f1_mic:.4f}\n'
+            
+            logline = f'{args.dataset},dgl,{ws},{args.topo},{epoch},{np.sum(dur):.4f},{val_f1_mic:.4f}\n'
             #logline = f'{args.dataset},dgl,{ws},{epoch},{np.sum(dur):.4f},{loss.item():.4f},{val_f1_mic:.4f}\n'
             print(logline)
             if rk == 0:
@@ -247,15 +278,8 @@ def main(args):
     end_time = time.time()
     print(f'training using time {end_time - start_time}')
 
-    # test
-    #if args.use_val:
-    #    model.load_state_dict(torch.load(os.path.join(
-    #        log_dir, 'best_model_{}.pkl'.format(task))))
     if cpu_flag and cuda:
         model = model.to('cpu')
-    #test_f1_mic, test_f1_mac = evaluate(
-    #    model, g, g.ndata['label'], test_mask, False)
-    #print("Test F1-mic {:.4f}, Test F1-mac {:.4f}".format(test_f1_mic, test_f1_mac))
 
 if __name__ == '__main__':
     warnings.filterwarnings('ignore')
@@ -263,11 +287,17 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='GraphSAINT')
     parser.add_argument("--dataset", type=str, default="ppi_n", help="type of tasks")
     parser.add_argument("--online", dest='online', action='store_true', help="sampling method in training phase")
+    parser.add_argument("--self_loop", action='store_true', help="")
+    parser.add_argument("--load", action='store_true', help="")
+    parser.add_argument("--dump", action='store_true', help="")
+    parser.add_argument("--nonorm", action='store_true', help="")
+    parser.add_argument("--symmetric", action='store_true', help="")
     parser.add_argument("--n_hidden", type=int, default=128)
     parser.add_argument("--n_epochs", type=int, default=50, help="the gpu index")
     parser.add_argument("--gpu", type=int, default=0, help="the gpu index")
     parser.add_argument("--lr", type=float, default=0.001, help="the gpu index")
     parser.add_argument("--csv", type=str, default='test.csv')
+    parser.add_argument("--topo", type=str, default='upper')
     parser.add_argument("--log_dir", type=str, default='test')
     args = parser.parse_args()
     #task = parser.parse_args().task

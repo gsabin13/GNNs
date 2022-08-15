@@ -34,24 +34,24 @@ import statistics
 import time
 import numpy as np
 
-def gcn_norm(edge_index, edge_weight=None, num_nodes=None, improved=False,
-             add_self_loops=True, dtype=None):
-    fill_value = 2. if improved else 1.
-    #num_nodes = maybe_num_nodes(edge_index, num_nodes)
-    if edge_weight is None:
-         edge_weight = torch.ones((edge_index.size(1), ), dtype=dtype,
-                                  device=edge_index.device)
-    if add_self_loops:
-         edge_index, tmp_edge_weight = add_remaining_self_loops(
-             edge_index, edge_weight, fill_value, num_nodes)
-         assert tmp_edge_weight is not None
-         edge_weight = tmp_edge_weight
-    row, col = edge_index[0], edge_index[1]
-    deg = scatter_add(edge_weight, col, dim=0, dim_size=num_nodes)
-    deg_inv_sqrt = deg.pow_(-0.5)
-    deg_inv_sqrt.masked_fill_(deg_inv_sqrt == float('inf'), 0)
-    #print('normalized adj val:', deg_inv_sqrt[row] * edge_weight * deg_inv_sqrt[col])
-    return edge_index, deg_inv_sqrt[row] * edge_weight * deg_inv_sqrt[col]
+#def gcn_norm(edge_index, edge_weight=None, num_nodes=None, improved=False,
+#             add_self_loops=True, dtype=None):
+#    fill_value = 2. if improved else 1.
+#    #num_nodes = maybe_num_nodes(edge_index, num_nodes)
+#    if edge_weight is None:
+#         edge_weight = torch.ones((edge_index.size(1), ), dtype=dtype,
+#                                  device=edge_index.device)
+#    #if add_self_loops:
+#    #     edge_index, tmp_edge_weight = add_remaining_self_loops(
+#    #         edge_index, edge_weight, fill_value, num_nodes)
+#    #     assert tmp_edge_weight is not None
+#    #     edge_weight = tmp_edge_weight
+#    row, col = edge_index[0], edge_index[1]
+#    deg = scatter_add(edge_weight, col, dim=0, dim_size=num_nodes)
+#    deg_inv_sqrt = deg.pow_(-0.5)
+#    deg_inv_sqrt.masked_fill_(deg_inv_sqrt == float('inf'), 0)
+#    #print('normalized adj val:', deg_inv_sqrt[row] * edge_weight * deg_inv_sqrt[col])
+#    return edge_index, deg_inv_sqrt[row] * edge_weight * deg_inv_sqrt[col]
 # comp_time = 0.0
 # comm_time = 0.0
 # scomp_time = 0.0
@@ -94,17 +94,29 @@ def gcn_norm(edge_index, edge_weight=None, num_nodes=None, improved=False,
     if edge_weight is None:
          edge_weight = torch.ones((edge_index.size(1), ), dtype=dtype,
                                   device=edge_index.device)
-    if add_self_loops:
-         edge_index, tmp_edge_weight = add_remaining_self_loops(
-             edge_index, edge_weight, fill_value, num_nodes)
-         assert tmp_edge_weight is not None
-         edge_weight = tmp_edge_weight
+    #if add_self_loops:
+    #     edge_index, tmp_edge_weight = add_remaining_self_loops(
+    #         edge_index, edge_weight, fill_value, num_nodes)
+    #     assert tmp_edge_weight is not None
+    #     edge_weight = tmp_edge_weight
     row, col = edge_index[0], edge_index[1]
-    deg = scatter_add(edge_weight, col, dim=0, dim_size=num_nodes)
-    deg_inv_sqrt = deg.pow_(-0.5)
-    deg_inv_sqrt.masked_fill_(deg_inv_sqrt == float('inf'), 0)
-    #print('normalized adj val:', deg_inv_sqrt[row] * edge_weight * deg_inv_sqrt[col])
-    return edge_index, deg_inv_sqrt[row] * edge_weight * deg_inv_sqrt[col]
+    #TODO use row to do scatter add
+    deg_out = scatter_add(edge_weight, col, dim=0, dim_size=num_nodes)
+    deg_in = scatter_add(edge_weight, row, dim=0, dim_size=num_nodes)
+    deg_out_sqrt = deg_out.pow_(-0.5)
+    deg_out_sqrt.masked_fill_(deg_out_sqrt == float('inf'), 1)
+    deg_in_sqrt = deg_in.pow_(-0.5)
+    deg_in_sqrt.masked_fill_(deg_in_sqrt == float('inf'), 1)
+    return edge_index, deg_in_sqrt[row] * edge_weight * deg_out_sqrt[col]
+    #return edge_index, deg_out_sqrt[row] * edge_weight * deg_in_sqrt[col]
+    #########Original Code Start###########################
+    #deg = scatter_add(edge_weight, col, dim=0, dim_size=num_nodes)
+    #deg_inv_sqrt = deg.pow_(-0.5)
+    #deg_inv_sqrt.masked_fill_(deg_inv_sqrt == float('inf'), 0)
+    ##print('normalized adj val:', deg_inv_sqrt[row] * edge_weight * deg_inv_sqrt[col])
+    #return edge_index, deg_inv_sqrt[row] * edge_weight * deg_inv_sqrt[col]
+    #########Original Code End###########################
+
 
 def start_time(group, rank, subset=False, src=None):
     global barrier_time
@@ -538,6 +550,7 @@ class GCNFunc(torch.autograd.Function):
         #print('z '+str(z.size()))
         if activations:
             if func is F.log_softmax:
+                torch.save(z, 'rdm_output_before_softmax.pt')
                 #return z
                 if ht:
                     h = func(z, dim=1)
@@ -643,7 +656,6 @@ def train(inputs, weight1, weight2, adj_matrix, am_partitions, optimizer, order,
     print(weight2)
     print('*'*30)
     print('adj:', adj_matrix)
-    #torch.save(adj_matrix, 'RDM_ADJ_Symmetric.pt')
     print('x:', inputs)
     print('*'*30)
     order1 = order[0] + order[3]
@@ -654,6 +666,7 @@ def train(inputs, weight1, weight2, adj_matrix, am_partitions, optimizer, order,
     order2 = order[1] + order[2]
     outputs = GCNFunc.apply(outputs, weight2, adj_matrix, am_partitions, rank, size, group, row_groups, col_groups, order2, True, F.log_softmax)
     print('layer1:',outputs.shape, outputs) 
+    torch.save(outputs, 'rdm_output.pt')
     #exit()
     optimizer.zero_grad()
     # print(data.train_mask.bool().size())
@@ -1075,36 +1088,34 @@ def run(rank, size, inputs, adj_matrix, data, features, classes, device):
         torch.manual_seed(0)
         random.seed(0)
         np.random.seed(0)
-        # TODO use 1 for weights and feats: result should be sum(nnz_per_row)
-        weight1_nonleaf = torch.rand(features, mid_layer, requires_grad=True)
-        torch.save(weight1_nonleaf, 'w1.pt')
+        if args.load:
+            weight1_nonleaf = torch.load('dgl_{}_w1.pt'.format(graphname))
+            weight2_nonleaf = torch.load('dgl_{}_w2.pt'.format(graphname))
+        else:
+            weight1_nonleaf = torch.rand(features, mid_layer, requires_grad=True)
+            torch.save(weight1_nonleaf, 'rdm_{}_w1.pt'.format(graphname))
+            weight2_nonleaf = torch.rand(mid_layer, classes, requires_grad=True)
+            torch.save(weight2_nonleaf, 'rdm_{}_w2.pt'.format(graphname))
+
+       # weight1_nonleaf = torch.ones(features, mid_layer, requires_grad=True)
+       # weight2_nonleaf = torch.ones(mid_layer, classes, requires_grad=True)
+
         weight1_nonleaf = weight1_nonleaf.to(device)
         weight1_nonleaf.retain_grad()
-
-        weight2_nonleaf = torch.rand(mid_layer, classes, requires_grad=True)
-        torch.save(weight2_nonleaf, 'w2.pt')
         weight2_nonleaf = weight2_nonleaf.to(device)
         weight2_nonleaf.retain_grad()
 
-       # weight1_nonleaf = torch.rand(features, mid_layer, requires_grad=True)
-       # torch.save(weight1_nonleaf, 'w1.pt')
-       # weight1_nonleaf = weight1_nonleaf.to(device)
-       # weight1_nonleaf.retain_grad()
-
-       # weight2_nonleaf = torch.rand(mid_layer, classes, requires_grad=True)
-       # torch.save(weight2_nonleaf, 'w2.pt')
-       # weight2_nonleaf = weight2_nonleaf.to(device)
-       # weight2_nonleaf.retain_grad()
-
         weight1 = Parameter(weight1_nonleaf)
+        weight1.requires_grad=True
         weight2 = Parameter(weight2_nonleaf)
+        weight2.requires_grad=True
         print(weight1.shape)
         print(weight1)
         print(weight2.shape)
         print(weight2)
         #exit()
 
-        optimizer = torch.optim.Adam([weight1, weight2], lr=0.001)
+        optimizer = torch.optim.Adam([weight1, weight2], lr=args.lr)
         dist.barrier(group)
 
         tstart = 0.0
@@ -1145,8 +1156,8 @@ def run(rank, size, inputs, adj_matrix, data, features, classes, device):
         
         ep_start = time.time()
         mmorder_c = candidate_order[0]
-        outputs = train(inputs_loc, weight1, weight2, adj_matrix_loc, am_pbyp, optimizer, mmorder_c, data, 
-                                rank, size, group, row_groups, col_groups, ht)
+        #outputs = train(inputs_loc, weight1, weight2, adj_matrix_loc, am_pbyp, optimizer, mmorder_c, data, 
+        #                        rank, size, group, row_groups, col_groups, ht)
         ep_end = time.time()
         ep_time = ep_end - ep_start
         order_time += [ep_time]
@@ -1161,7 +1172,7 @@ def run(rank, size, inputs, adj_matrix, data, features, classes, device):
         # for epoch in range(1, 201):
         print(f"\nStarting training... rank {rank} run {i}", flush=True)
         elapsed_time = 0
-        for epoch in range(50):            
+        for epoch in range(1000):            
             if len(order_time) < len(candidate_order):
                 mmorder_c = candidate_order[len(order_time)]
             elif best_mmorder == -1:
@@ -1174,9 +1185,16 @@ def run(rank, size, inputs, adj_matrix, data, features, classes, device):
                 mmorder_c = candidate_order[best_mmorder]
                         
             ep_start = time.time()            
+            if args.dump:
+                torch.save(weight1, 'rdm_dumped_w1.pt')
+                torch.save(weight2, 'rdm_dumped_w2.pt')
+                #exit()
             outputs = train(inputs_loc, weight1, weight2, adj_matrix_loc, am_pbyp, optimizer, mmorder_c, data, 
                                     rank, size, group, row_groups, col_groups, ht)
             ep_end = time.time()
+            if epoch >=1:
+                pass
+                #exit()
             
             ep_time = ep_end - ep_start
             elapsed_time+=ep_time
@@ -1209,7 +1227,7 @@ def run(rank, size, inputs, adj_matrix, data, features, classes, device):
                     print(log)
                     with open(args.acc_csv, 'a') as f:
                         ws = os.environ['WORLD_SIZE']
-                        log = f'{graphname},RDM,{ws},{epoch:03d},{elapsed_time:.4f},{tmp_test_acc:.4f}\n'
+                        log = f'{graphname},RDM,{ws},{args.topo},{epoch:03d},{elapsed_time:.4f},{tmp_test_acc:.4f}\n'
                         f.write(log) 
 
 
@@ -1421,6 +1439,44 @@ def main():
         data = data.to(device)
         inputs.requires_grad = True
         data.y = data.y.to(device)
+    elif graphname == 'toy':
+        adj_full = torch.tensor([[1,2,3,4,5],[0,1,2,3,4]]).long()
+        x_full = torch.ones(6,1)
+        y_full = torch.ones(6).long()
+        train_mask_full = torch.ones(6).bool()
+        val_mask_full = torch.ones(6).bool()
+        test_mask_full = torch.ones(6).bool()
+        data = Data()
+        data.edge_index = adj_full
+        data.x = x_full
+        data.y = y_full
+        data.x.requires_grad = True
+        data.train_mask = train_mask_full
+        data.val_mask = val_mask_full
+        inputs = data.x.to(device)
+        data.y = data.y.to(device)
+        edge_index = data.edge_index
+        num_nodes = len(data.x)
+        deg = degree(edge_index[0])
+        print((deg==1).nonzero().shape)
+        print(deg.max())
+        print(len(edge_index[0]))
+        # TODO only symmetrify arxiv prod
+        if args.topo=='sym':
+            print('making symmetric')
+            edge_index = symmetric(edge_index)
+            torch.save(edge_index, 'RDM_ADJ_Symmetric.pt')
+            # to be deleted
+            exit()
+        else:
+            edge_index, _ = add_remaining_self_loops(edge_index) 
+        _, data.edge_weight = gcn_norm(edge_index, num_nodes=num_nodes)
+        #data.edge_weight = torch.ones(edge_index[0].shape)
+        print(edge_index.shape)
+        print(edge_index)
+        num_features = x_full.shape[-1]
+        num_classes = 2
+
     elif graphname in ['meta', 'arctic25', 'oral', 'arxiv', 'reddit', 'products']:
         if graphname == 'arxiv':
             graphname = 'ogbn-arxiv'
@@ -1431,13 +1487,17 @@ def main():
         x_full = torch.load(pref+'x_full.pt')
         y_full = torch.load(pref+'y_full.pt')
         print(f'{graphname}, {len(adj_full[0])}, {len(x_full)}, {len(adj_full[0])/len(x_full)}')
+        print(y_full.max())
 #        exit()
-
         train_mask_full = torch.load(pref+'train_mask_full.pt')
         val_mask_full = torch.load(pref+'val_mask_full.pt')
         test_mask_full = torch.load(pref+'test_mask_full.pt')
         data = Data()
-        data.edge_index = adj_full
+
+        if args.topo in ['upper', 'sym']:
+            data.edge_index = adj_full
+        elif args.topo == 'lower':
+            data.edge_index = torch.stack((adj_full[1], adj_full[0]))
         data.x = x_full
         data.y = y_full
         data.x.requires_grad = True
@@ -1450,30 +1510,35 @@ def main():
         data.y = data.y.to(device)
         edge_index = data.edge_index
         num_nodes = len(data.x)
-        #if not normalization:
-        _, data.edge_weight = gcn_norm(data.edge_index, num_nodes=num_nodes)
-        #else:
-        #    data.edge_weight=None
         #edge_index = to_undirected(edge_index)
         #edge_index = symmetric(edge_index)
         deg = degree(edge_index[0])
-        print((deg==1).nonzero().shape)
-        print(deg.max())
-        print(len(edge_index[0]))
+        #print((deg==1).nonzero().shape)
+        #print(deg.max())
+        #print(len(edge_index[0]))
         #exit()
         # TODO only symmetrify arxiv prod
         #edge_index = symmetric(edge_index)
-        edge_index, _ = add_remaining_self_loops(edge_index) 
+        if args.topo == 'sym':
+            print('making symmetric')
+            edge_index = symmetric(edge_index)
+            torch.save(edge_index, pref+'adj_full_sym.pt')
+            #print('Saved symmetric adj')
+            #exit()
+        else:
+            edge_index, _ = add_remaining_self_loops(edge_index) 
+        _, data.edge_weight = gcn_norm(edge_index, num_nodes=num_nodes)
+#        data.edge_weight = torch.ones(edge_index[0].shape)
         print(edge_index.shape)
         print(edge_index)
-        torch.save(edge_index, 'RDM_ADJ_SYM.pt')
+        #exit()
         #exit()
         num_features = x_full.shape[-1]
         tmp = {}
         tmp['meta'] = 25
         tmp['oral'] = 32 
         tmp['reddit'] = 41
-        tmp['arctic25'] = 33
+        tmp['arctic25'] = 33 
         tmp['ogbn-arxiv'] = 40
         tmp['ogbn-products'] = 47
         num_classes = tmp[graphname]
@@ -1507,9 +1572,12 @@ def main():
         #inputs.requires_grad = True
         data.y = data.y.squeeze().to(device)
         edge_index = data.edge_index
-        print('making symmetric')
-        edge_index = symmetric(edge_index)
-#        edge_index, _ = add_remaining_self_loops(edge_index) 
+        if args.symmetric:
+            print('making symmetric')
+            exit()
+            edge_index = symmetric(edge_index)
+        else:
+            edge_index, _ = add_remaining_self_loops(edge_index) 
         print('adj:', edge_index.shape)
         num_features = dataset.num_features if not 'mag' in graphname else 128
         num_classes = dataset.num_classes
@@ -1574,6 +1642,7 @@ if __name__ == '__main__':
     parser.add_argument("--local_rank", type=int)
     parser.add_argument("--accperrank", type=int)
     parser.add_argument("--epochs", type=int)
+    parser.add_argument("--lr", type=float, default=0.01)
     parser.add_argument("--graphname", type=str)
     parser.add_argument("--timing", type=str)
     parser.add_argument("--midlayer", type=int)
@@ -1582,6 +1651,10 @@ if __name__ == '__main__':
     parser.add_argument("--activations", type=str)
     parser.add_argument("--accuracy", type=str)
     parser.add_argument("--download", type=bool)
+    parser.add_argument("--load", action='store_true')
+    parser.add_argument("--dump", action='store_true')
+    #parser.add_argument("--symmetric", action='store_true')
+    parser.add_argument("--topo", type=str, default='lower')
     parser.add_argument("--mmorder", type=str)
     parser.add_argument("--replication", type=int)
     parser.add_argument("--acc_csv", type=str)
