@@ -1,0 +1,12 @@
+1) Full Batch: x-axis Accuracy, y-axis runtime
+    For a given network (Full Batch GCN DGL) - hyperparameter (Learning Rate, Hidden Layers?, Hidden Size?)
+    {DGL, PyG} : 2
+    {airways, artric, oral, prodcuts, reddit, arxiv} : 6
+    {atom learning rate={0.05, 0.01, 0.005, 0.001}, dropout={0, 0.25, 0.5}, withdecay={...}, normalization={none, left, right, both} x {hidden layers, hidden size}
+2) Clustering Techiuqes: ClusterGCN and GraphSAINT: Sweep hyper paraemters for the clustering algorihtms - Batch Size, Technique, parameters
+3) Sampling: GraphSAGE (Neighbor), FastGCN (Layer)
+
+
+4) GAT, GIN, Etc. <-- a bit more fundamental changes. 
+
+Above is all node classification. Lets look into edge and graph classification. 
