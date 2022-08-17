@@ -1,4 +1,4 @@
-Dataset,Method,Epoch,Time,Acc
+Dataset,Method,GPU,Triangle,Epoch,Time,Acc
 airways,dgl,1,lower,0,1.1502,0.1372
 airways,dgl,1,lower,1,1.3873,0.2228
 airways,dgl,1,lower,2,1.6432,0.2228
